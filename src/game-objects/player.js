@@ -13,6 +13,7 @@ export default class Player
 		this.right = scene.matter.add.sprite(config.x, config.y, config.key, null, { shape: config.shape });
 
 		this.right.setVisible(false);
+		this.right.setToSleep();
 
 		this.left.body.label = 'player';
 		this.right.body.label = 'player';
@@ -106,11 +107,17 @@ export default class Player
 		        this.right.setRotation(Phaser.Math.DegToRad(70) + (Phaser.Math.DegToRad(70) - lineAngle));
 
 		        this.left.setVisible(true);
-		        this.right.setVisible(false);
+				this.right.setVisible(false);
+				
+				this.left.setAwake();
+				this.right.setToSleep();
 			}
 			else
 			{
-		        this.right.setRotation(lineAngle);
+				this.right.setRotation(lineAngle);
+				
+				this.left.setToSleep();
+				this.right.setAwake();
 
 		        this.left.setVisible(false);
 		        this.right.setVisible(true);
@@ -126,7 +133,10 @@ export default class Player
 		        this.right.setRotation(Phaser.Math.DegToRad(70) + (Phaser.Math.DegToRad(70) - lineAngle));
 
 		        this.left.setVisible(true);
-		        this.right.setVisible(false);
+				this.right.setVisible(false);
+				
+				this.left.setAwake();
+				this.right.setToSleep();
 			}
 			else if (angleDeg < 0 && angleDeg > -120)
 			{
@@ -136,14 +146,20 @@ export default class Player
 		        this.right.setRotation(lineAngle);
 
 		        this.left.setVisible(false);
-		        this.right.setVisible(true);
+				this.right.setVisible(true);
+				
+				this.left.setToSleep();
+				this.right.setAwake();
 			}
 			else
 			{
 		        this.right.setRotation(reflectAngle - Phaser.Math.DegToRad(30));
 
 		        this.left.setVisible(true);
-		        this.right.setVisible(false);
+				this.right.setVisible(false);
+				
+				this.left.setAwake();
+				this.right.setToSleep();
 			}
 		}
 
