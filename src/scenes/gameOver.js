@@ -59,12 +59,16 @@ export default class GameOverScene extends Phaser.Scene {
 			.on("pointerout", function () {
 				this.setColor("white");
 			})
-			.on("pointerup", function () {
-				this.sound.play("demon_theme", {
-					loop: true,
-				});
-				this.scene.start("playGame");
-			}, this);
+			.on(
+				"pointerup",
+				function () {
+					this.sound.play("demon_theme", {
+						loop: true,
+					});
+					this.scene.start("playGame");
+				},
+				this
+			);
 
 		container.add(title).add(score).add(bestScore).add(playButton).layout();
 

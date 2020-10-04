@@ -5,6 +5,8 @@ import soundOnImg from "../assets/images/white_soundOn.png";
 import soundOffImg from "../assets/images/white_soundOff.png";
 import skullImg from "../assets/images/skull.png";
 //* Spritesheets
+import bloodSpriteSheet from "../assets/spritesheets/blood_splatter.png";
+import bloodSpriteJSON from "../assets/spritesheets/blood_splatter.json";
 import eyeballsSpriteSheet from "../assets/spritesheets/eyeballs.png";
 import eyeballsJSON from "../assets/spritesheets/eyeballs.json";
 import ghostWarriorSpriteSheet from "../assets/spritesheets/ghost-warrior.png";
@@ -21,7 +23,7 @@ import { v4 as uuidv4 } from "uuid";
 import { assetsDPR } from "..";
 import { alignGrid } from "../assets/configs/alignGrid";
 
-const playerShapeKeys = [ 'body', 'melee', 'axe' ];
+const playerShapeKeys = ["body", "melee", "axe"];
 
 class playGame extends Phaser.Scene {
 	constructor() {
@@ -73,6 +75,7 @@ class playGame extends Phaser.Scene {
 		this.load.json("ghost_warrior_shapes", ghostWarriorShape);
 		this.load.json("skull_shapes", skullShape);
 
+		this.load.atlas("blood", bloodSpriteSheet, bloodSpriteJSON);
 		this.load.atlas("ghost_warrior", ghostWarriorSpriteSheet, ghostWarriorJSON);
 		this.load.atlas("eyeballs", eyeballsSpriteSheet, eyeballsJSON);
 
@@ -93,6 +96,7 @@ class playGame extends Phaser.Scene {
 		this.createAnimation("hit", "ghost_warrior", "hit", 1, 6, ".png", false, 0, 20);
 		this.createAnimation("death", "ghost_warrior", "death", 1, 8, ".png", false, 30);
 		this.createAnimation("eye_twitch", "eyeballs", "eyeball", 1, 5, ".png", false, -1, 3);
+		this.createAnimation("blood_splatter", "blood", "blood", 0, 29, ".png", false, 0, 30);
 
 		this.make.image({
 			key: "background",
@@ -210,7 +214,7 @@ class playGame extends Phaser.Scene {
 		this.soundOn.on("pointerdown", this.onToggleSound, this);
 		this.soundOff.on("pointerdown", this.onToggleSound, this);
 
-		this.sound.volume = 0.5;
+		this.sound.volume = 0.1;
 
 		this.input.on(
 			"pointerdown",
@@ -237,27 +241,27 @@ class playGame extends Phaser.Scene {
 			"collisionstart",
 			function (event, bodyA, bodyB) {
         if ((bodyA.label === "skull" && bodyB.label.length <= 5) || (playerShapeKeys.includes(bodyA.label) && playerShapeKeys.includes(bodyB.label))) return;
-				if (bodyA.label === "skull" && bodyB.label.length > 5) {
-					this.killEnemy(bodyB.label);
+				if (bodyA.label === "skull" && bodyB.label.length > 5 && this.enemies[bodyB.label].isAlive) {
+					this.killEnemy(bodyB.label, false);
 					this.lives -= 1;
 					this.sound.play("skull_damaged");
 					if (this.remainingTargets > 0) {
 						this.cameras.main.shake(200);
 						return;
 					}
-				} else if (bodyA.label === "axe" && !this.afk) {
-					this.killEnemy(bodyB.label);
+				} else if (bodyA.label === "axe" && !this.afk && this.enemies[bodyB.label].isAlive) {
+					this.killEnemy(bodyB.label, true);
 					this.score++;
 					this.scoreText.setText(`${this.score}`);
 					this.sound.play("eye_kill");
-				} else if (bodyA.label === "body") {
-					this.killEnemy(bodyB.label);
+				} else if (bodyA.label === "body" && this.enemies[bodyB.label].isAlive) {
+					this.killEnemy(bodyB.label, false);
 					this.player.hit();
 				}
 				//! Melee frames 8 - 12
 				//* Check the current frame
-				else if (this.player.isMelee()) {
-					this.killEnemy(bodyB.label);
+				else if (this.player.isMelee() && this.enemies[bodyB.label].isAlive) {
+					this.killEnemy(bodyB.label, false);
 					this.score++;
 					this.scoreText.setText(`${this.score}`);
 					this.sound.play("eye_kill");
@@ -301,7 +305,8 @@ class playGame extends Phaser.Scene {
 		}
 		if (this.level < this.levels.length - 1) {
 			this.scene.sleep("playGame");
-			this.level += 1;
+      this.level += 1;
+      this.removeEnemies();
 			this.initEnemies();
 			this.remainingTargets = this.levels[this.level].targets;
 			this.scene.launch("scoreScene");
@@ -310,17 +315,35 @@ class playGame extends Phaser.Scene {
 		}
 	}
 
-	killEnemy(label) {
+	killEnemy(label, playerKill) {
 		if (this.enemies[label]) {
 			if (this.enemies[label].tween) {
 				this.enemies[label].tween.remove();
 			}
-
-			this.enemies[label].destroy();
-
+      
+      if (playerKill) {
+        this.enemies[label].play("blood_splatter");
+        this.enemies[label].setToSleep();
+        this.enemies[label].isAlive = false;
+      } else {
+        this.enemies[label].destroy();
+        delete this.enemies[label];
+      }
 			this.remainingTargets -= 1;
 		}
-	}
+  }
+  
+  removeEnemies() {
+    const keys = Object.keys(this.enemies);
+
+    for (let i = 0; i < keys.length; i++) {
+			if (this.enemies[[keys[i]]].tween) {
+				this.enemies[[keys[i]]].tween.remove();
+			}
+      this.enemies[keys[i]].destroy();
+      delete this.enemies[keys[i]];
+    }
+  }
 
 	initEnemies() {
 		var delay = 0;
@@ -330,7 +353,7 @@ class playGame extends Phaser.Scene {
 			const { x, y } = this.getRandomCoordinates(side);
 
 			const key = uuidv4();
-			this.enemies[key] = new Enemy({ world: this.matter.world, x, y, key: "demon_eye", label: key });
+      this.enemies[key] = new Enemy({ world: this.matter.world, x, y, key: "demon_eye", label: key });
 			this.enemies[key].body.angle = Math.atan2(y - this.skull.y, x - this.skull.x);
 			delay += Between(minDelay, maxDelay);
 
@@ -355,14 +378,14 @@ class playGame extends Phaser.Scene {
 				delay,
 				duration: speed,
 				onComplete: function () {
-					this.killEnemy(key);
+					this.killEnemy(key, false);
 					this.lives -= 1;
 					this.sound.play("skull_damaged");
 					this.cameras.main.shake(200);
 				}.bind(this),
 			});
 		}
-	}
+  }
 
 	getRandomCoordinates(position) {
 		//* Top

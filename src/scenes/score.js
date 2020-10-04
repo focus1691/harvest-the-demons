@@ -7,9 +7,9 @@ import { assetsDPR } from "../index";
 export default class GameOverScene extends Phaser.Scene {
 	constructor() {
 		super("scoreScene");
-    }
+	}
 	preload() {
-        this.load.image("background", backgroundImg);
+		this.load.image("background", backgroundImg);
 		alignGrid.create({ scene: this, rows: 10, columns: 10 });
 	}
 	create() {
@@ -27,22 +27,27 @@ export default class GameOverScene extends Phaser.Scene {
 			space: { item: 50 },
 		});
 
-		const resume = this.add.text(0, 0, "Continue", {
-			fontSize: `${36 * assetsDPR}px`,
-			fontFamily: constants.styles.text.fontFamily,
-        })
-        .setInteractive()
-        .on("pointerover", function () {
-            this.setColor("green");
-        })
-        .on("pointerout", function () {
-            this.setColor("white");
-        })
-        .on("pointerup", function () {
-            this.scene.stop("scoreScene");
-            this.sound.volume = 0.5;
-            this.scene.wake("playGame");
-        }, this);
+		const resume = this.add
+			.text(0, 0, "Continue", {
+				fontSize: `${36 * assetsDPR}px`,
+				fontFamily: constants.styles.text.fontFamily,
+			})
+			.setInteractive()
+			.on("pointerover", function () {
+				this.setColor("green");
+			})
+			.on("pointerout", function () {
+				this.setColor("white");
+			})
+			.on(
+				"pointerup",
+				function () {
+					this.scene.stop("scoreScene");
+					this.sound.volume = 0.5;
+					this.scene.wake("playGame");
+				},
+				this
+			);
 
 		container.add(resume).layout();
 
