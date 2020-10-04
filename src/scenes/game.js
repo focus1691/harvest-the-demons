@@ -13,7 +13,7 @@ import ghostWarriorSpriteSheet from "../assets/spritesheets/ghost-warrior.png";
 import ghostWarriorJSON from "../assets/spritesheets/ghost-warrior.json";
 // Game Objects
 import Player from "../game-objects/player";
-import Enemy from "../game-objects/enemy";
+import Eyeball from "../game-objects/eyeball";
 import Skull from "../game-objects/skull";
 //* Physics
 import ghostWarriorShape from "../assets/PhysicsEditor/ghost_warrior.json";
@@ -364,7 +364,7 @@ class playGame extends Phaser.Scene {
 			let side = Math.floor(Math.random() * 4 + 1);
 			const { x, y } = this.getRandomCoordinates(side);
 			const key = uuidv4();
-			this.enemies[key] = new Enemy({ world: this.matter.world, x, y, key: "demon_eye", label: key });
+			this.enemies[key] = new Eyeball({ world: this.matter.world, x, y, key: "demon_eye", label: key });
 			this.enemies[key].body.angle = Math.atan2(y - this.skull.y, x - this.skull.x);
 			delay += Between(minDelay, maxDelay);
 
