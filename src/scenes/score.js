@@ -43,7 +43,7 @@ export default class GameOverScene extends Phaser.Scene {
 				"pointerup",
 				function () {
 					this.scene.stop("scoreScene");
-					this.sound.volume = 0.5;
+					this.sound.volume = 0.2;
 					this.scene.wake("playGame");
 				},
 				this

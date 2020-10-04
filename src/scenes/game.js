@@ -43,12 +43,6 @@ class playGame extends Phaser.Scene {
 		this.best = localStorage.getItem("best_score") ? parseInt(localStorage.getItem("best_score"), 10) : 0;
 		this.levels = [
 			{
-				targets: 3,
-				minDelay: 1000,
-				maxDelay: 2000,
-				speed: 6000,
-			},
-			{
 				targets: 10,
 				minDelay: 1000,
 				maxDelay: 2000,
@@ -59,6 +53,24 @@ class playGame extends Phaser.Scene {
 				minDelay: 1000,
 				maxDelay: 2000,
 				speed: 4000,
+			},
+			{
+				targets: 20,
+				minDelay: 500,
+				maxDelay: 1500,
+				speed: 3000,
+			},
+			{
+				targets: 20,
+				minDelay: 500,
+				maxDelay: 1000,
+				speed: 2000,
+			},
+			{
+				targets: 30,
+				minDelay: 500,
+				maxDelay: 1000,
+				speed: 1500,
 			},
 		];
 		this.enemies = {};
@@ -214,7 +226,7 @@ class playGame extends Phaser.Scene {
 		this.soundOn.on("pointerdown", this.onToggleSound, this);
 		this.soundOff.on("pointerdown", this.onToggleSound, this);
 
-		this.sound.volume = 0.1;
+		this.sound.volume = 0.2;
 
 		this.input.on(
 			"pointerdown",
@@ -240,7 +252,7 @@ class playGame extends Phaser.Scene {
 		this.matter.world.on(
 			"collisionstart",
 			function (event, bodyA, bodyB) {
-        if ((bodyA.label === "skull" && bodyB.label.length <= 5) || (playerShapeKeys.includes(bodyA.label) && playerShapeKeys.includes(bodyB.label))) return;
+				if ((bodyA.label === "skull" && bodyB.label.length <= 5) || (playerShapeKeys.includes(bodyA.label) && playerShapeKeys.includes(bodyB.label))) return;
 				if (bodyA.label === "skull" && bodyB.label.length > 5 && this.enemies[bodyB.label].isAlive) {
 					this.killEnemy(bodyB.label, false);
 					this.lives -= 1;
@@ -305,8 +317,8 @@ class playGame extends Phaser.Scene {
 		}
 		if (this.level < this.levels.length - 1) {
 			this.scene.sleep("playGame");
-      this.level += 1;
-      this.removeEnemies();
+			this.level += 1;
+			this.removeEnemies();
 			this.initEnemies();
 			this.remainingTargets = this.levels[this.level].targets;
 			this.scene.launch("scoreScene");
@@ -320,30 +332,30 @@ class playGame extends Phaser.Scene {
 			if (this.enemies[label].tween) {
 				this.enemies[label].tween.remove();
 			}
-      
-      if (playerKill) {
-        this.enemies[label].play("blood_splatter");
-        this.enemies[label].setToSleep();
-        this.enemies[label].isAlive = false;
-      } else {
-        this.enemies[label].destroy();
-        delete this.enemies[label];
-      }
+
+			if (playerKill) {
+				this.enemies[label].play("blood_splatter");
+				this.enemies[label].setToSleep();
+				this.enemies[label].isAlive = false;
+			} else {
+				this.enemies[label].destroy();
+				delete this.enemies[label];
+			}
 			this.remainingTargets -= 1;
 		}
-  }
-  
-  removeEnemies() {
-    const keys = Object.keys(this.enemies);
+	}
 
-    for (let i = 0; i < keys.length; i++) {
+	removeEnemies() {
+		const keys = Object.keys(this.enemies);
+
+		for (let i = 0; i < keys.length; i++) {
 			if (this.enemies[[keys[i]]].tween) {
 				this.enemies[[keys[i]]].tween.remove();
 			}
-      this.enemies[keys[i]].destroy();
-      delete this.enemies[keys[i]];
-    }
-  }
+			this.enemies[keys[i]].destroy();
+			delete this.enemies[keys[i]];
+		}
+	}
 
 	initEnemies() {
 		var delay = 0;
@@ -351,9 +363,8 @@ class playGame extends Phaser.Scene {
 		for (let i = 0; i < targets; i++) {
 			let side = Math.floor(Math.random() * 4 + 1);
 			const { x, y } = this.getRandomCoordinates(side);
-
 			const key = uuidv4();
-      this.enemies[key] = new Enemy({ world: this.matter.world, x, y, key: "demon_eye", label: key });
+			this.enemies[key] = new Enemy({ world: this.matter.world, x, y, key: "demon_eye", label: key });
 			this.enemies[key].body.angle = Math.atan2(y - this.skull.y, x - this.skull.x);
 			delay += Between(minDelay, maxDelay);
 
@@ -385,7 +396,7 @@ class playGame extends Phaser.Scene {
 				}.bind(this),
 			});
 		}
-  }
+	}
 
 	getRandomCoordinates(position) {
 		//* Top
