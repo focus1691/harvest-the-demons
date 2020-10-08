@@ -11,6 +11,12 @@ import eyeballsSpriteSheet from '../assets/spritesheets/eyeballs.png';
 import eyeballsJSON from '../assets/spritesheets/eyeballs.json';
 import ghostWarriorSpriteSheet from '../assets/spritesheets/ghost-warrior.png';
 import ghostWarriorJSON from '../assets/spritesheets/ghost-warrior.json';
+//* mp3
+import axeSwingSound from '../assets/sound/zapsplat_warfare_weapon_axe_large_object_swing_swoosh_002.mp3';
+import bigEyeKillSound from '../assets/sound/zapsplat_nature_water_pour_splatter_concrete_002_43152.mp3';
+import eyeKillSound from '../assets/sound/industrial_tools_axe_chop_wood_009.mp3';
+import playerHitSound from '../assets/sound/horror_monster_zombie_male_groan_005.mp3';
+import skullHitSound from '../assets/sound/zapsplat_horror_zombie_male_groan_growl_11766.mp3';
 // Game Objects
 import Player from '../game-objects/player';
 import Eyeball from '../game-objects/eyeball';
@@ -33,7 +39,7 @@ class playGame extends Phaser.Scene {
     this.accumMS = 0;
     this.hzMS = (1 / 60) * 1000;
     this.afk = false;
-    this.level = level || 0;
+    this.level = level || 1;
     this.score = 0;
     this.lives = 5;
     this.best = localStorage.getItem('best_score') ? parseInt(localStorage.getItem('best_score'), 10) : 0;
@@ -68,14 +74,14 @@ class playGame extends Phaser.Scene {
       },
       {
         targets: 30,
-        bigTargets: 3,
+        bigTargets: 0,
         minDelay: 500,
         maxDelay: 1000,
         speed: 1500,
       },
     ];
     this.enemies = {};
-    this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTarget;
+    this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTargets;
   }
 
   preload() {
@@ -92,10 +98,11 @@ class playGame extends Phaser.Scene {
     this.load.atlas('ghost_warrior', ghostWarriorSpriteSheet, ghostWarriorJSON);
     this.load.atlas('eyeballs', eyeballsSpriteSheet, eyeballsJSON);
 
-    this.load.audio('eye_kill', 'src/assets/sound/industrial_tools_axe_chop_wood_009.mp3');
-    this.load.audio('axe_swing', 'src/assets/sound/zapsplat_warfare_weapon_axe_large_object_swing_swoosh_002.mp3');
-    this.load.audio('player_damaged', 'src/assets/sound/horror_monster_zombie_male_groan_005.mp3');
-    this.load.audio('skull_damaged', 'src/assets/sound/zapsplat_horror_zombie_male_groan_growl_11766.mp3');
+    this.load.audio('axe_swing', axeSwingSound);
+    this.load.audio('big_eye_kill', bigEyeKillSound);
+    this.load.audio('eye_kill', eyeKillSound);
+    this.load.audio('player_damaged', playerHitSound);
+    this.load.audio('skull_damaged', skullHitSound);
 
     alignGrid.create({ scene: this, rows: 10, columns: 10 });
     // Uncomment to see UI grid
@@ -104,7 +111,7 @@ class playGame extends Phaser.Scene {
   create() {
     //* Create the animations
     this.createAnimation('fly', 'ghost_warrior', 'fly', 1, 5, '.png', true, -1, 10);
-    this.createAnimation('attack', 'ghost_warrior', 'Attack', 1, 11, '.png', false, 0, 20);
+    this.createAnimation('attack', 'ghost_warrior', 'Attack', 1, 11, '.png', false, 0, 30);
     this.createAnimation('idle', 'ghost_warrior', 'idle', 1, 5, '.png', true, -1, 10);
     this.createAnimation('hit', 'ghost_warrior', 'hit', 1, 6, '.png', false, 0, 20);
     this.createAnimation('death', 'ghost_warrior', 'death', 1, 8, '.png', false, 30);
@@ -248,7 +255,7 @@ class playGame extends Phaser.Scene {
       this.afk = false;
     });
 
-    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) { }, this);
+    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {}, this);
 
     this.matter.world.on(
       'collisionstart',
@@ -262,7 +269,7 @@ class playGame extends Phaser.Scene {
             this.cameras.main.shake(200);
             return;
           }
-        } else if (bodyA.label === 'axe' && !this.afk && this.enemies[bodyB.label].isAlive) {
+        } else if (bodyA.label === 'axe' && !this.afk && this.enemies[bodyB.label].isAlive && !this.enemies[bodyB.label].bigEye && !this.player.isAttacking()) {
           this.killEnemy(bodyB.label, true);
           this.score++;
           this.scoreText.setText(`${this.score}`);
@@ -274,10 +281,10 @@ class playGame extends Phaser.Scene {
         //! Melee frames 8 - 12
         //* Check the current frame
         else if (this.player.isMelee() && this.enemies[bodyB.label].isAlive) {
-          this.killEnemy(bodyB.label, false);
+          this.sound.play(this.enemies[bodyB.label].bigEye ? 'big_eye_kill' : 'eye_kill');
+          this.killEnemy(bodyB.label, true);
           this.score++;
           this.scoreText.setText(`${this.score}`);
-          this.sound.play('eye_kill');
         }
         if (this.remainingTargets === 0) {
           this.roundOver();
@@ -286,7 +293,7 @@ class playGame extends Phaser.Scene {
       this
     );
 
-    this.matter.world.on('collisionend', function (event, bodyA, bodyB) { }, this);
+    this.matter.world.on('collisionend', function (event, bodyA, bodyB) {}, this);
 
     this.initEnemies();
 
@@ -321,10 +328,10 @@ class playGame extends Phaser.Scene {
       this.level += 1;
       this.removeEnemies();
       this.initEnemies();
-      this.remainingTargets = this.levels[this.level].targets;
+      this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTargets;
       this.scene.launch('scoreScene');
     } else {
-      this.scene.start('gameOverScene', { score: this.score, best: this.best });
+      this.scene.launch('gameOverScene', { score: this.score, best: this.best });
     }
   }
 
@@ -363,13 +370,16 @@ class playGame extends Phaser.Scene {
     // Destructure Level props
     const { minDelay, maxDelay, speed, targets, bigTargets } = this.levels[this.level];
     const bigEyeTime = [];
-    for (let i = 0; i < bigTargets.length; i++) {
-      bigEyeTime.push(Between(0, bigTargets - 1));
+    for (let i = 0; i < bigTargets; i++) {
+      bigEyeTime.push(Between(0, targets - 1));
     }
-    bigEyeTime.sort();
+    bigEyeTime.sort(function (a, b) {
+      return a - b;
+    });
+    console.log(bigEyeTime);
 
     // Setup all the enemies for this level
-    for (let i = 0; i < targets;) {
+    for (let i = 0; i < targets; ) {
       if (bigEyeTime.length > 0 && bigEyeTime[0] === i) {
         bigEyeTime.splice(0, 1);
         delay = this.createEnemy(delay, minDelay, maxDelay, speed, true);
@@ -383,7 +393,14 @@ class playGame extends Phaser.Scene {
   createEnemy(delay, min, max, speed, bigEye) {
     const { x, y } = this.getEnemyPosition(Between(1, 4));
     const key = uuidv4();
-    this.enemies[key] = new Eyeball({ world: this.matter.world, x, y, key: 'demon_eye', label: bigEye ? `big-${key}` : key, bigEye });
+    this.enemies[key] = new Eyeball({
+      world: this.matter.world,
+      x,
+      y,
+      key: 'demon_eye',
+      label: key,
+      bigEye,
+    });
     this.enemies[key].body.angle = Math.atan2(y - this.skull.y, x - this.skull.x);
     delay += Between(min, max);
 
@@ -422,21 +439,18 @@ class playGame extends Phaser.Scene {
     const H = this.cameras.main.height;
     if (position === 1) {
       //* Top left
-      return { x: Between(0, W / 2 - (75 * assetsDPR) * 2), y: 0 };
-    }
-    else if (position === 2) {
+      return { x: Between(0, W / 2 - 75 * assetsDPR * 2), y: 0 };
+    } else if (position === 2) {
       //* Top right
-      return { x: Between(W / 2 + (75 * assetsDPR) * 2, W), y: 0 };
-    }
-    else if (position === 3) {
+      return { x: Between(W / 2 + 75 * assetsDPR * 2, W), y: 0 };
+    } else if (position === 3) {
       //* Left
       return { x: 0, y: Between(0, H) };
-    }
-    else if (position === 4) {
+    } else if (position === 4) {
       // Right
       return { x: W, y: Between(0, H) };
     }
-    return { x: Between(0, W / 2 - (75 * assetsDPR) * 2), y: 0 };
+    return { x: Between(0, W / 2 - 75 * assetsDPR * 2), y: 0 };
   }
 
   createAnimation(key, name, prefix, start, end, suffix, yoyo, repeat, frameRate) {
