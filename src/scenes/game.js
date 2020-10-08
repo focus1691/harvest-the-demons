@@ -52,13 +52,6 @@ class playGame extends Phaser.Scene {
         duration: 4000,
       },
       {
-        targets: 0,
-        bigTargets: 5,
-        minDelay: 1000,
-        maxDelay: 2000,
-        duration: 4000,
-      },
-      {
         targets: 20,
         bigTargets: 3,
         minDelay: 1000,
@@ -267,17 +260,23 @@ class playGame extends Phaser.Scene {
       this
     );
 
-    this.input.on('gameout', function () {
-      this.player.idle();
-      this.afk = true;
-    }, this);
+    this.input.on(
+      'gameout',
+      function () {
+        this.player.idle();
+        this.afk = true;
+      },
+      this
+    );
 
-    this.input.on('gameover', function () {
-      this.player.fly();
-      this.afk = false;
-    }, this);
-
-    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {}, this);
+    this.input.on(
+      'gameover',
+      function () {
+        this.player.fly();
+        this.afk = false;
+      },
+      this
+    );
 
     this.matter.world.on(
       'collisionstart',
@@ -319,19 +318,6 @@ class playGame extends Phaser.Scene {
       this
     );
 
-    this.matter.world.on('collisionend', function (event, bodyA, bodyB) {
-        //* Eye eye collides with the melee
-        if (this.enemies[bodyB.label] && this.enemies[bodyB.label].isAlive && (bodyA.label === 'melee')) {
-          this.sound.play(this.enemies[bodyB.label].bigEye ? 'big_eye_kill' : 'eye_kill');
-          this.killEnemy(bodyB.label, true);
-          this.score++;
-          this.scoreText.setText(`${this.score}`);
-          if (this.remainingTargets === 0) {
-            this.roundOver();
-          }
-        }
-    }, this);
-
     this.initEnemies();
 
     this.cameras.main.fadeIn(500);
@@ -356,6 +342,7 @@ class playGame extends Phaser.Scene {
   }
 
   roundOver() {
+    console.log('round over');
     if (this.score > this.best) {
       localStorage.setItem('best_score', this.score);
       this.best = this.score;
@@ -421,7 +408,7 @@ class playGame extends Phaser.Scene {
         return a - b;
       });
 
-      for (let i = 0; i < targets;) {
+      for (let i = 0; i < targets; ) {
         if (bigEyeTime.length > 0 && bigEyeTime[0] === i) {
           bigEyeTime.splice(0, 1);
           delay = this.createEnemy(delay, minDelay, maxDelay, duration, true);
@@ -429,7 +416,7 @@ class playGame extends Phaser.Scene {
           delay = this.createEnemy(delay, minDelay, maxDelay, duration, false);
           i++;
         }
-      } 
+      }
     }
   }
 

@@ -38,41 +38,6 @@
 				}
 			},
 			{
-				"label": "melee",
-				"isSensor": true,
-				"vertices": [
-					[ { "x":95, "y":14 }, { "x":17, "y":91 }, { "x":70, "y":280 } ]
-				]
-			},
-			{
-				"label": "melee",
-				"isSensor": true,
-				"vertices": [
-					[ { "x":16, "y":91 }, { "x":12, "y":223 }, { "x":70, "y":279 } ]
-				]
-			},
-			{
-				"label": "melee",
-				"isSensor": true,
-				"vertices": [
-					[ { "x":129, "y":133 }, { "x":87, "y":107 }, { "x":71, "y":280 } ]
-				]
-			},
-			{
-				"label": "melee",
-				"isSensor": true,
-				"vertices": [
-					[ { "x":182, "y":6 }, { "x":95, "y":15 }, { "x":91, "y":67 } ]
-				]
-			},
-			{
-				"label": "melee",
-				"isSensor": true,
-				"vertices": [
-					[ { "x":130, "y":133 }, { "x":90, "y":64 }, { "x":87, "y":107 } ]
-				]
-			},
-			{
 				"label": "axe",
 				"isSensor": true,
 				"vertices": [
@@ -85,6 +50,78 @@
 				"vertices": [
 					[ { "x":118, "y":186 }, { "x":34, "y":250 }, { "x":141, "y":246 } ]
 				]
+			},
+			{
+				"label": "melee",
+				"isSensor": true,
+				"circle": {
+					"x": 112.60869565217394,
+					"y": 62.6521739130435,
+					"radius": 61.25709913499034
+				}
+			},
+			{
+				"label": "melee",
+				"isSensor": true,
+				"circle": {
+					"x": 82.60869565217388,
+					"y": 104.82608695652172,
+					"radius": 61.52672156512717
+				}
+			},
+			{
+				"label": "melee",
+				"isSensor": true,
+				"circle": {
+					"x": 87.39130434782611,
+					"y": 257.8695652173913,
+					"radius": 45.7929840095194
+				}
+			},
+			{
+				"label": "melee",
+				"isSensor": true,
+				"circle": {
+					"x": 64.34782608695649,
+					"y": 204.82608695652175,
+					"radius": 64.1354172173011
+				}
+			},
+			{
+				"label": "melee",
+				"isSensor": true,
+				"circle": {
+					"x": 88.26086956521733,
+					"y": 244.82608695652178,
+					"radius": 61.52672156512717
+				}
+			},
+			{
+				"label": "melee",
+				"isSensor": true,
+				"circle": {
+					"x": 68.26086956521736,
+					"y": 143.9565217391304,
+					"radius": 67.62625812275732
+				}
+			},
+			{
+				"label": "melee",
+				"isSensor": true,
+				"circle": {
+					"x": 104.34782608695653,
+					"y": 212.21739130434787,
+					"radius": 54.332171658481066
+				}
+			},
+			{
+				"label": "melee",
+				"isSensor": true,
+				"circle": {
+					"x": 113.04347826086962,
+					"y": 128.30434782608697,
+					"radius": 61.25709913499034
+				}
 			}
 		]
 	}
