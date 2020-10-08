@@ -162,6 +162,6 @@ export default class Player {
 	}
 
 	isMelee() {
-		return Boolean(this.left.anims.currentFrame.textureFrame.match(/attack[8-9]|attack1[02]/gi));
+		return Boolean(this.left.anims.currentFrame.textureFrame.match(/attack[6-9]|attack1[01]/gi));
 	}
 }

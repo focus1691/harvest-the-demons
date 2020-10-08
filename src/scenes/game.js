@@ -14,7 +14,7 @@ import ghostWarriorJSON from '../assets/spritesheets/ghost-warrior.json';
 //* mp3
 import axeSwingSound from '../assets/sound/zapsplat_warfare_weapon_axe_large_object_swing_swoosh_002.mp3';
 import bigEyeKillSound from '../assets/sound/zapsplat_nature_water_pour_splatter_concrete_002_43152.mp3';
-import eyeKillSound from '../assets/sound/industrial_tools_axe_chop_wood_009.mp3';
+import eyeKillSound from '../assets/sound/zapsplat_impact_body_heavy_splat_squelch_guts_bones_break_13492.mp3';
 import playerHitSound from '../assets/sound/horror_monster_zombie_male_groan_005.mp3';
 import skullHitSound from '../assets/sound/zapsplat_horror_zombie_male_groan_growl_11766.mp3';
 // Game Objects
@@ -39,45 +39,66 @@ class playGame extends Phaser.Scene {
     this.accumMS = 0;
     this.hzMS = (1 / 60) * 1000;
     this.afk = false;
-    this.level = level || 1;
+    this.level = level || 0;
     this.score = 0;
     this.lives = 5;
     this.best = localStorage.getItem('best_score') ? parseInt(localStorage.getItem('best_score'), 10) : 0;
     this.levels = [
       {
-        targets: 10,
+        targets: 5,
         bigTargets: 0,
         minDelay: 1000,
         maxDelay: 2000,
-        speed: 4000,
+        duration: 4000,
+      },
+      {
+        targets: 0,
+        bigTargets: 5,
+        minDelay: 1000,
+        maxDelay: 2000,
+        duration: 4000,
       },
       {
         targets: 20,
         bigTargets: 3,
         minDelay: 1000,
         maxDelay: 2000,
-        speed: 4000,
+        duration: 4000,
+      },
+      {
+        targets: 0,
+        bigTargets: 20,
+        minDelay: 1000,
+        maxDelay: 2000,
+        duration: 4000,
       },
       {
         targets: 20,
         bigTargets: 3,
         minDelay: 500,
         maxDelay: 1500,
-        speed: 3000,
+        duration: 3000,
+      },
+      {
+        targets: 0,
+        bigTargets: 15,
+        minDelay: 500,
+        maxDelay: 1500,
+        duration: 3000,
       },
       {
         targets: 20,
         bigTargets: 3,
         minDelay: 500,
         maxDelay: 1000,
-        speed: 2000,
+        duration: 2000,
       },
       {
         targets: 30,
         bigTargets: 0,
         minDelay: 500,
         maxDelay: 1000,
-        speed: 1500,
+        duration: 1500,
       },
     ];
     this.enemies = {};
@@ -111,7 +132,7 @@ class playGame extends Phaser.Scene {
   create() {
     //* Create the animations
     this.createAnimation('fly', 'ghost_warrior', 'fly', 1, 5, '.png', true, -1, 10);
-    this.createAnimation('attack', 'ghost_warrior', 'Attack', 1, 11, '.png', false, 0, 30);
+    this.createAnimation('attack', 'ghost_warrior', 'Attack', 1, 11, '.png', false, 0, 40);
     this.createAnimation('idle', 'ghost_warrior', 'idle', 1, 5, '.png', true, -1, 10);
     this.createAnimation('hit', 'ghost_warrior', 'hit', 1, 6, '.png', false, 0, 20);
     this.createAnimation('death', 'ghost_warrior', 'death', 1, 8, '.png', false, 30);
@@ -246,14 +267,15 @@ class playGame extends Phaser.Scene {
       this
     );
 
-    document.addEventListener('mouseout', () => {
+    this.input.on('gameout', function () {
       this.player.idle();
       this.afk = true;
-    });
-    document.addEventListener('mouseenter', () => {
+    }, this);
+
+    this.input.on('gameover', function () {
       this.player.fly();
       this.afk = false;
-    });
+    }, this);
 
     this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {}, this);
 
@@ -261,6 +283,7 @@ class playGame extends Phaser.Scene {
       'collisionstart',
       function (event, bodyA, bodyB) {
         if ((bodyA.label === 'skull' && bodyB.label.length <= 5) || (playerShapeKeys.includes(bodyA.label) && playerShapeKeys.includes(bodyB.label))) return;
+        //* Any eye collides with the skull
         if (bodyA.label === 'skull' && bodyB.label.length > 5 && this.enemies[bodyB.label].isAlive) {
           this.killEnemy(bodyB.label, false);
           this.lives -= 1;
@@ -269,18 +292,21 @@ class playGame extends Phaser.Scene {
             this.cameras.main.shake(200);
             return;
           }
-        } else if (bodyA.label === 'axe' && !this.afk && this.enemies[bodyB.label].isAlive && !this.enemies[bodyB.label].bigEye && !this.player.isAttacking()) {
+        }
+        //* Small eye collides with the player axe
+        else if (bodyA.label === 'axe' && !this.afk && this.enemies[bodyB.label].isAlive && !this.enemies[bodyB.label].bigEye && !this.player.isAttacking()) {
           this.killEnemy(bodyB.label, true);
           this.score++;
           this.scoreText.setText(`${this.score}`);
           this.sound.play('eye_kill');
-        } else if (bodyA.label === 'body' && this.enemies[bodyB.label].isAlive) {
+        }
+        //* Either eye collides with the player body
+        else if (bodyA.label === 'body' && this.enemies[bodyB.label].isAlive) {
           this.killEnemy(bodyB.label, false);
           this.player.hit();
         }
-        //! Melee frames 8 - 12
-        //* Check the current frame
-        else if (this.player.isMelee() && this.enemies[bodyB.label].isAlive) {
+        //* Eye eye collides with the melee
+        else if (this.player.isMelee() && this.enemies[bodyB.label].isAlive && (bodyA.label === 'axe' || bodyA.label === 'melee')) {
           this.sound.play(this.enemies[bodyB.label].bigEye ? 'big_eye_kill' : 'eye_kill');
           this.killEnemy(bodyB.label, true);
           this.score++;
@@ -293,7 +319,18 @@ class playGame extends Phaser.Scene {
       this
     );
 
-    this.matter.world.on('collisionend', function (event, bodyA, bodyB) {}, this);
+    this.matter.world.on('collisionend', function (event, bodyA, bodyB) {
+        //* Eye eye collides with the melee
+        if (this.enemies[bodyB.label] && this.enemies[bodyB.label].isAlive && (bodyA.label === 'melee')) {
+          this.sound.play(this.enemies[bodyB.label].bigEye ? 'big_eye_kill' : 'eye_kill');
+          this.killEnemy(bodyB.label, true);
+          this.score++;
+          this.scoreText.setText(`${this.score}`);
+          if (this.remainingTargets === 0) {
+            this.roundOver();
+          }
+        }
+    }, this);
 
     this.initEnemies();
 
@@ -368,29 +405,35 @@ class playGame extends Phaser.Scene {
   initEnemies() {
     var delay = 0;
     // Destructure Level props
-    const { minDelay, maxDelay, speed, targets, bigTargets } = this.levels[this.level];
-    const bigEyeTime = [];
-    for (let i = 0; i < bigTargets; i++) {
-      bigEyeTime.push(Between(0, targets - 1));
-    }
-    bigEyeTime.sort(function (a, b) {
-      return a - b;
-    });
-    console.log(bigEyeTime);
+    const { minDelay, maxDelay, duration, targets, bigTargets } = this.levels[this.level];
 
     // Setup all the enemies for this level
-    for (let i = 0; i < targets; ) {
-      if (bigEyeTime.length > 0 && bigEyeTime[0] === i) {
-        bigEyeTime.splice(0, 1);
-        delay = this.createEnemy(delay, minDelay, maxDelay, speed, true);
-      } else {
-        delay = this.createEnemy(delay, minDelay, maxDelay, speed, false);
-        i++;
+    if (targets === 0) {
+      for (let i = 0; i < bigTargets; i++) {
+        delay = this.createEnemy(delay, minDelay, maxDelay, duration, true);
       }
+    } else {
+      const bigEyeTime = [];
+      for (let i = 0; i < bigTargets; i++) {
+        bigEyeTime.push(Between(0, targets - 1));
+      }
+      bigEyeTime.sort(function (a, b) {
+        return a - b;
+      });
+
+      for (let i = 0; i < targets;) {
+        if (bigEyeTime.length > 0 && bigEyeTime[0] === i) {
+          bigEyeTime.splice(0, 1);
+          delay = this.createEnemy(delay, minDelay, maxDelay, duration, true);
+        } else {
+          delay = this.createEnemy(delay, minDelay, maxDelay, duration, false);
+          i++;
+        }
+      } 
     }
   }
 
-  createEnemy(delay, min, max, speed, bigEye) {
+  createEnemy(delay, min, max, duration, bigEye) {
     const { x, y } = this.getEnemyPosition(Between(1, 4));
     const key = uuidv4();
     this.enemies[key] = new Eyeball({
@@ -423,7 +466,7 @@ class playGame extends Phaser.Scene {
         to: 1,
       },
       delay,
-      duration: speed,
+      duration,
       onComplete: function () {
         this.killEnemy(key, false);
         this.lives -= 1;
