@@ -4,7 +4,9 @@ export default class Enemy extends Phaser.Physics.Matter.Sprite {
   constructor(config) {
     super(config.world, config.x, config.y, config.key);
 
-    this.setScale(1 / (assetsDPR / 3), 1 / (assetsDPR / 3));
+    let scale = config.bigEye ? 1 / (assetsDPR / 3) : 1 / assetsDPR;
+
+    this.setScale(scale, scale);
 
     this.body.label = config.label;
 

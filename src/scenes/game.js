@@ -47,35 +47,35 @@ class playGame extends Phaser.Scene {
       },
       {
         targets: 20,
-        bigTarget: 3,
+        bigTargets: 3,
         minDelay: 1000,
         maxDelay: 2000,
         speed: 4000,
       },
       {
         targets: 20,
-        bigTarget: 3,
+        bigTargets: 3,
         minDelay: 500,
         maxDelay: 1500,
         speed: 3000,
       },
       {
         targets: 20,
-        bigTarget: 3,
+        bigTargets: 3,
         minDelay: 500,
         maxDelay: 1000,
         speed: 2000,
       },
       {
         targets: 30,
-        bigTarget: 3,
+        bigTargets: 3,
         minDelay: 500,
         maxDelay: 1000,
         speed: 1500,
       },
     ];
     this.enemies = {};
-    this.remainingTargets = this.levels[this.level].targets;
+    this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTarget;
   }
 
   preload() {
@@ -248,7 +248,7 @@ class playGame extends Phaser.Scene {
       this.afk = false;
     });
 
-    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) {}, this);
+    this.matter.world.on('collisionactive', function (event, bodyA, bodyB) { }, this);
 
     this.matter.world.on(
       'collisionstart',
@@ -286,7 +286,7 @@ class playGame extends Phaser.Scene {
       this
     );
 
-    this.matter.world.on('collisionend', function (event, bodyA, bodyB) {}, this);
+    this.matter.world.on('collisionend', function (event, bodyA, bodyB) { }, this);
 
     this.initEnemies();
 
@@ -360,49 +360,66 @@ class playGame extends Phaser.Scene {
 
   initEnemies() {
     var delay = 0;
-    const { minDelay, maxDelay, speed, targets } = this.levels[this.level];
-    for (let i = 0; i < targets; i++) {
-      let side = Math.floor(Math.random() * 4 + 1);
-      const { x, y } = this.getRandomCoordinates(side);
-      const key = uuidv4();
-      this.enemies[key] = new Eyeball({ world: this.matter.world, x, y, key: 'demon_eye', label: key });
-      this.enemies[key].body.angle = Math.atan2(y - this.skull.y, x - this.skull.x);
-      delay += Between(minDelay, maxDelay);
+    // Destructure Level props
+    const { minDelay, maxDelay, speed, targets, bigTargets } = this.levels[this.level];
+    const bigEyeTime = [];
+    for (let i = 0; i < bigTargets.length; i++) {
+      bigEyeTime.push(Between(0, bigTargets - 1));
+    }
+    bigEyeTime.sort();
 
-      this.enemies[key].tween = this.tweens.add({
-        targets: this.enemies[key],
-        visible: {
-          from: true,
-        },
-        x: {
-          from: x,
-          to: this.skull.x,
-        },
-        y: {
-          from: y,
-          to: this.skull.y,
-        },
-        alpha: {
-          start: 0,
-          from: 0,
-          to: 1,
-        },
-        delay,
-        duration: speed,
-        onComplete: function () {
-          this.killEnemy(key, false);
-          this.lives -= 1;
-          this.sound.play('skull_damaged');
-          this.cameras.main.shake(200);
-        }.bind(this),
-      });
+    // Setup all the enemies for this level
+    for (let i = 0; i < targets;) {
+      if (bigEyeTime.length > 0 && bigEyeTime[0] === i) {
+        bigEyeTime.splice(0, 1);
+        delay = this.createEnemy(delay, minDelay, maxDelay, speed, true);
+      } else {
+        delay = this.createEnemy(delay, minDelay, maxDelay, speed, false);
+        i++;
+      }
     }
   }
 
-  getRandomCoordinates(position) {
+  createEnemy(delay, min, max, speed, bigEye) {
+    const { x, y } = this.getEnemyPosition(Between(1, 4));
+    const key = uuidv4();
+    this.enemies[key] = new Eyeball({ world: this.matter.world, x, y, key: 'demon_eye', label: bigEye ? `big-${key}` : key, bigEye });
+    this.enemies[key].body.angle = Math.atan2(y - this.skull.y, x - this.skull.x);
+    delay += Between(min, max);
+
+    this.enemies[key].tween = this.tweens.add({
+      targets: this.enemies[key],
+      visible: {
+        from: true,
+      },
+      x: {
+        from: x,
+        to: this.skull.x,
+      },
+      y: {
+        from: y,
+        to: this.skull.y,
+      },
+      alpha: {
+        start: 0,
+        from: 0,
+        to: 1,
+      },
+      delay,
+      duration: speed,
+      onComplete: function () {
+        this.killEnemy(key, false);
+        this.lives -= 1;
+        this.sound.play('skull_damaged');
+        this.cameras.main.shake(200);
+      }.bind(this),
+    });
+    return delay;
+  }
+
+  getEnemyPosition(position) {
     const W = this.cameras.main.width;
     const H = this.cameras.main.height;
-    return { x: W, y: H };
     if (position === 1) {
       //* Top left
       return { x: Between(0, W / 2 - (75 * assetsDPR) * 2), y: 0 };
