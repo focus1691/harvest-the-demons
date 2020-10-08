@@ -12,7 +12,7 @@ module.exports = merge(base, {
   devServer: {
     contentBase: path.resolve(__dirname, '../'),
     compress: true,
-    port: 9000
+    port: process.env.PORT || 5000
   },
   performance: {
     maxEntrypointSize: 900000,
