@@ -9,6 +9,11 @@ module.exports = merge(base, {
     filename: 'bundle.min.js'
   },
   devtool: false,
+  devServer: {
+    contentBase: path.resolve(__dirname, '../'),
+    compress: true,
+    port: 9000
+  },
   performance: {
     maxEntrypointSize: 900000,
     maxAssetSize: 900000
