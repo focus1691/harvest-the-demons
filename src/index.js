@@ -1,11 +1,11 @@
-import Phaser from "phaser";
-import playGame from "./scenes/game";
-import "./css/style.css";
-import titleScene from "./scenes/title";
-import scoreScene from "./scenes/score";
-import gameOverScene from "./scenes/gameOver";
-import RexUIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
-import { alignGrid } from "./assets/configs/alignGrid";
+import Phaser from 'phaser';
+import playGame from './scenes/game';
+import './css/style.css';
+import titleScene from './scenes/title';
+import scoreScene from './scenes/score';
+import gameOverScene from './scenes/gameOver';
+import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
+import { alignGrid } from './assets/configs/alignGrid';
 
 const roundHalf = (num) => Math.round(num * 2) / 2;
 const DPR = window.devicePixelRatio;
@@ -19,7 +19,7 @@ export const assetsDPR = roundHalf(Math.min(Math.max(WIDTH / 640, 1), 4));
 
 const config = {
   type: Phaser.AUTO,
-  parent: "harvest-the-demons",
+  parent: 'harvest-the-demons',
   width: WIDTH,
   height: HEIGHT,
   dom: {
@@ -30,7 +30,7 @@ const config = {
     autoCenter: Phaser.DOM.CENTER_BOTH,
   },
   physics: {
-    default: "matter",
+    default: 'matter',
     matter: {
       debug: false,
     },
@@ -39,9 +39,9 @@ const config = {
   plugins: {
     scene: [
       {
-        key: "rexUI",
+        key: 'rexUI',
         plugin: RexUIPlugin,
-        mapping: "rexUI",
+        mapping: 'rexUI',
         start: true,
       },
     ],
