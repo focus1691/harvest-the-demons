@@ -15,8 +15,8 @@ module.exports = merge(base, {
     port: process.env.PORT || 5000
   },
   performance: {
-    maxEntrypointSize: 900000,
-    maxAssetSize: 900000
+    maxEntrypointSize: 1260000,
+    maxAssetSize: 1260000
   },
   optimization: {
     minimizer: [
@@ -27,6 +27,10 @@ module.exports = merge(base, {
           }
         }
       })
-    ]
+    ],
+    splitChunks: {
+      // include all types of chunks
+      chunks: 'all'
+    }
   }
 });
