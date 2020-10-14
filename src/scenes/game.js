@@ -278,45 +278,9 @@ class playGame extends Phaser.Scene {
       this
     );
 
-    this.matter.world.on(
-      'collisionstart',
-      function (event, bodyA, bodyB) {
-        if ((bodyA.label === 'skull' && bodyB.label.length <= 5) || (playerShapeKeys.includes(bodyA.label) && playerShapeKeys.includes(bodyB.label))) return;
-        //* Any eye collides with the skull
-        if (bodyA.label === 'skull' && bodyB.label.length > 5 && this.enemies[bodyB.label].isAlive) {
-          this.killEnemy(bodyB.label, false);
-          this.lives -= 1;
-          this.sound.play('skull_damaged');
-          if (this.remainingTargets > 0) {
-            this.cameras.main.shake(200);
-            return;
-          }
-        }
-        //* Small eye collides with the player axe
-        else if (bodyA.label === 'axe' && !this.afk && this.enemies[bodyB.label].isAlive && !this.enemies[bodyB.label].bigEye && !this.player.isAttacking()) {
-          this.killEnemy(bodyB.label, true);
-          this.score++;
-          this.scoreText.setText(`${this.score}`);
-          this.sound.play('eye_kill');
-        }
-        //* Either eye collides with the player body
-        else if (bodyA.label === 'body' && this.enemies[bodyB.label].isAlive) {
-          this.killEnemy(bodyB.label, false);
-          this.player.hit();
-        }
-        //* Eye eye collides with the melee
-        else if (this.player.isMelee() && this.enemies[bodyB.label].isAlive && (bodyA.label === 'axe' || bodyA.label === 'melee')) {
-          this.sound.play(this.enemies[bodyB.label].bigEye ? 'big_eye_kill' : 'eye_kill');
-          this.killEnemy(bodyB.label, true);
-          this.score++;
-          this.scoreText.setText(`${this.score}`);
-        }
-        if (this.remainingTargets === 0) {
-          this.roundOver();
-        }
-      },
-      this
-    );
+    this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
+      this.handleCollision(bodyA, bodyB);
+    }, this);
 
     this.initEnemies();
 
@@ -408,7 +372,7 @@ class playGame extends Phaser.Scene {
         return a - b;
       });
 
-      for (let i = 0; i < targets; ) {
+      for (let i = 0; i < targets;) {
         if (bigEyeTime.length > 0 && bigEyeTime[0] === i) {
           bigEyeTime.splice(0, 1);
           delay = this.createEnemy(delay, minDelay, maxDelay, duration, true);
@@ -481,6 +445,42 @@ class playGame extends Phaser.Scene {
       return { x: W, y: Between(0, H) };
     }
     return { x: Between(0, W / 2 - 75 * assetsDPR * 2), y: 0 };
+  }
+
+  handleCollision(bodyA, bodyB) {
+    if ((bodyA.label === 'skull' && bodyB.label.length <= 5) || (playerShapeKeys.includes(bodyA.label) && playerShapeKeys.includes(bodyB.label))) return;
+    //* Any eye collides with the skull
+    if (bodyA.label === 'skull' && bodyB.label.length > 5 && this.enemies[bodyB.label].isAlive) {
+      this.killEnemy(bodyB.label, false);
+      this.lives -= 1;
+      this.sound.play('skull_damaged');
+      if (this.remainingTargets > 0) {
+        this.cameras.main.shake(200);
+        return;
+      }
+    }
+    //* Small eye collides with the player axe
+    else if (bodyA.label === 'axe' && !this.afk && this.enemies[bodyB.label].isAlive && !this.enemies[bodyB.label].bigEye && !this.player.isAttacking()) {
+      this.killEnemy(bodyB.label, true);
+      this.score++;
+      this.scoreText.setText(`${this.score}`);
+      this.sound.play('eye_kill');
+    }
+    //* Either eye collides with the player body
+    else if (bodyA.label === 'body' && this.enemies[bodyB.label].isAlive) {
+      this.killEnemy(bodyB.label, false);
+      this.player.hit();
+    }
+    //* Eye eye collides with the melee
+    else if (this.player.isMelee() && this.enemies[bodyB.label].isAlive && (bodyA.label === 'axe' || bodyA.label === 'melee')) {
+      this.sound.play(this.enemies[bodyB.label].bigEye ? 'big_eye_kill' : 'eye_kill');
+      this.killEnemy(bodyB.label, true);
+      this.score++;
+      this.scoreText.setText(`${this.score}`);
+    }
+    if (this.remainingTargets === 0) {
+      this.roundOver();
+    }
   }
 
   createAnimation(key, name, prefix, start, end, suffix, yoyo, repeat, frameRate) {
