@@ -4,6 +4,9 @@ import backgroundImg from '../assets/images/background.jpg';
 import constants from '../assets/configs/constants';
 import { alignGrid } from '../assets/configs/alignGrid';
 import { assetsDPR } from '../index';
+//* mp3
+import demonLordAudio from '../assets/sound/demon_lord.mp3';
+
 export default class TitleScene extends Phaser.Scene {
   constructor() {
     super('titleScene');
@@ -12,7 +15,7 @@ export default class TitleScene extends Phaser.Scene {
   preload() {
     this.load.image('background', backgroundImg);
 
-    this.load.audio('demon_theme', 'src/assets/sound/demon_lord.mp3');
+    this.load.audio('demon_theme', demonLordAudio);
 
     alignGrid.create({ scene: this, rows: 10, columns: 10 });
   }
