@@ -31,10 +31,12 @@ export default class GameOverScene extends Phaser.Scene {
       .text(0, 0, 'Continue', {
         fontSize: `${36 * assetsDPR}px`,
         fontFamily: constants.styles.text.fontFamily,
+        strokeThickness: 3,
       })
       .setInteractive()
       .on('pointerover', function () {
-        this.setColor('green');
+        this.setColor('#660000');
+        this.setStroke('#660000');
       })
       .on('pointerout', function () {
         this.setColor('white');

@@ -35,16 +35,19 @@ export default class GameOverScene extends Phaser.Scene {
     const title = this.add.text(0, 0, 'Game Over', {
       fontSize: `${36 * assetsDPR}px`,
       fontFamily: constants.styles.text.fontFamily,
+      strokeThickness: 3,
     });
 
     const score = this.add.text(0, 0, `Score ${this.score}`, {
-      fontSize: `${24 * assetsDPR}px`,
+      fontSize: `${36 * assetsDPR}px`,
       fontFamily: constants.styles.text.fontFamily,
+      strokeThickness: 3,
     });
 
     const bestScore = this.add.text(0, 0, `High Score ${this.best}`, {
-      fontSize: `${24 * assetsDPR}px`,
+      fontSize: `${36 * assetsDPR}px`,
       fontFamily: constants.styles.text.fontFamily,
+      strokeThickness: 3,
     });
 
     const playButton = this.add
@@ -54,7 +57,8 @@ export default class GameOverScene extends Phaser.Scene {
       })
       .setInteractive()
       .on('pointerover', function () {
-        this.setColor('red');
+        this.setColor('#660000');
+        this.setStroke('#660000');
       })
       .on('pointerout', function () {
         this.setColor('white');
