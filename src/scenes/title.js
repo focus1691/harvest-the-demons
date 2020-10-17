@@ -35,18 +35,23 @@ export default class TitleScene extends Phaser.Scene {
     });
 
     const title = this.add.text(0, 0, 'Harvest the Demons', {
-      fontSize: `${36 * assetsDPR}px`,
+      fontSize: `${72 * assetsDPR}px`,
       fontFamily: constants.styles.text.fontFamily,
+      stroke: '#660000',
+      strokeThickness: 10,
+      color: '#660000',
     });
 
     const playButton = this.add
       .text(0, 0, 'Play', {
-        fontSize: `${12 * assetsDPR}px`,
+        fontSize: `${36 * assetsDPR}px`,
         fontFamily: constants.styles.text.fontFamily,
+        strokeThickness: 3,
       })
       .setInteractive()
       .on('pointerover', function () {
-        this.setColor('red');
+        this.setColor('#660000');
+        this.setStroke('#660000');
       })
       .on('pointerout', function () {
         this.setColor('white');
