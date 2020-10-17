@@ -19,7 +19,9 @@ import playerHitSound from '../assets/sound/horror_monster_zombie_male_groan_005
 import skullHitSound from '../assets/sound/zapsplat_horror_zombie_male_groan_growl_11766.mp3';
 // Game Objects
 import Player from '../game-objects/player';
+import EnergyBar from '../game-objects/energyBar';
 import Eyeball from '../game-objects/eyeball';
+import HealthBar from '../game-objects/healthBar';
 import Skull from '../game-objects/skull';
 //* Physics
 import ghostWarriorShape from '../assets/PhysicsEditor/ghost_warrior.json';
@@ -28,6 +30,24 @@ import { Between } from 'phaser/src/math/';
 import { v4 as uuidv4 } from 'uuid';
 import { assetsDPR } from '..';
 import { alignGrid } from '../assets/configs/alignGrid';
+//? Health Bar
+import energyBarLeftFrame from '../assets/images/healthbar/blue/meter_bar_holder_left_edge_blue.png';
+import energyBarLeftEdge from '../assets/images/healthbar/blue/meter_bar_left_edge_blue.png';
+import energyBarMeterFrame from '../assets/images/healthbar/blue/meter_bar_holder_center-repeating_blue.png';
+import energyBarMeter from '../assets/images/healthbar/blue/meter_bar_center-repeating_blue.png';
+import energyBarRightEdge from '../assets/images/healthbar/blue/meter_bar_right_edge_blue.png';
+import energyBarRightFrame from '../assets/images/healthbar/blue/meter_bar_holder_right_edge_blue.png';
+import energyMeterBadge from '../assets/images/healthbar/blue/meter_icon_holder_blue.png';
+import energyMeterIcon from '../assets/images/healthbar/icons/power.png';
+//! Health Bar
+import healthBarLeftFrame from '../assets/images/healthbar/red/meter_bar_holder_left_edge_red.png';
+import healthBarLeftEdge from '../assets/images/healthbar/red/meter_bar_left_edge_red.png';
+import healthBarMeterFrame from '../assets/images/healthbar/red/meter_bar_holder_center-repeating_red.png';
+import healthBarMeter from '../assets/images/healthbar/red/meter_bar_center-repeating_red.png';
+import healthBarRightEdge from '../assets/images/healthbar/red/meter_bar_right_edge_red.png';
+import healthBarRightFrame from '../assets/images/healthbar/red/meter_bar_holder_right_edge_red.png';
+import healthMeterBadge from '../assets/images/healthbar/red/meter_icon_holder_red.png';
+import healthMeterIcon from '../assets/images/healthbar/icons/health.png';
 
 const playerShapeKeys = ['body', 'melee', 'axe'];
 
@@ -104,6 +124,26 @@ class playGame extends Phaser.Scene {
     this.load.image('sound_on', soundOnImg);
     this.load.image('sound_off', soundOffImg);
     this.load.image('skull', skullImg);
+
+    // Health Bar
+    this.load.image('health_bar_left_frame', healthBarLeftFrame);
+    this.load.image('health_bar_left_edge', healthBarLeftEdge);
+    this.load.image('health_bar_meter', healthBarMeter);
+    this.load.image('health_bar_meter_frame', healthBarMeterFrame);
+    this.load.image('health_bar_right_frame', healthBarRightFrame);
+    this.load.image('health_bar_right_edge', healthBarRightEdge);
+    this.load.image('health_bar_badge', healthMeterBadge);
+    this.load.image('health_bar_icon', healthMeterIcon);
+
+    // Energy Bar
+    this.load.image('energy_bar_left_frame', energyBarLeftFrame);
+    this.load.image('energy_bar_left_edge', energyBarLeftEdge);
+    this.load.image('energy_bar_meter', energyBarMeter);
+    this.load.image('energy_bar_meter_frame', energyBarMeterFrame);
+    this.load.image('energy_bar_right_frame', energyBarRightFrame);
+    this.load.image('energy_bar_right_edge', energyBarRightEdge);
+    this.load.image('energy_bar_badge', energyMeterBadge);
+    this.load.image('energy_bar_icon', energyMeterIcon);
 
     this.load.json('ghost_warrior_shapes', ghostWarriorShape);
     this.load.json('skull_shapes', skullShape);
@@ -194,6 +234,9 @@ class playGame extends Phaser.Scene {
       })
       .play('eye_twitch');
 
+    this.healthBar = new HealthBar(this);
+    this.energyBar = new EnergyBar(this);
+
     this.input.mouse.disableContextMenu();
 
     const circleX = this.game.config.width / 2;
@@ -221,8 +264,15 @@ class playGame extends Phaser.Scene {
 
     Phaser.Display.Align.In.TopCenter(this.player, this.skull);
 
-    this.scoreText = this.add.text(0, 0, `${this.score}`, { fontSize: 16 * assetsDPR }).setOrigin(0.5, 0.5);
-    alignGrid.placeAtIndex(0, this.scoreText);
+    this.scoreText = this.make.text({
+      x: 0,
+      y: 0,
+      text: `${this.score}`,
+      style: { fontSize: 16 * assetsDPR, strokeThickness: 3 },
+      origin: { x: 1, y: 0.5 },
+    });
+
+    alignGrid.placeAtIndex(4, this.scoreText);
 
     //* Sound Effects
     this.soundOn = this.make
@@ -278,9 +328,13 @@ class playGame extends Phaser.Scene {
       this
     );
 
-    this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
-      this.handleCollision(bodyA, bodyB);
-    }, this);
+    this.matter.world.on(
+      'collisionstart',
+      function (event, bodyA, bodyB) {
+        this.handleCollision(bodyA, bodyB);
+      },
+      this
+    );
 
     this.initEnemies();
 
@@ -372,7 +426,7 @@ class playGame extends Phaser.Scene {
         return a - b;
       });
 
-      for (let i = 0; i < targets;) {
+      for (let i = 0; i < targets; ) {
         if (bigEyeTime.length > 0 && bigEyeTime[0] === i) {
           bigEyeTime.splice(0, 1);
           delay = this.createEnemy(delay, minDelay, maxDelay, duration, true);
