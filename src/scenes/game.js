@@ -235,6 +235,7 @@ class playGame extends Phaser.Scene {
       .play('eye_twitch');
 
     this.healthBar = new HealthBar(this);
+    // this.healthBar.damage(60);
     this.energyBar = new EnergyBar(this);
 
     this.input.mouse.disableContextMenu();
@@ -370,6 +371,7 @@ class playGame extends Phaser.Scene {
       this.level += 1;
       this.removeEnemies();
       this.initEnemies();
+      this.healthBar.restore();
       this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTargets;
       this.scene.launch('scoreScene');
     } else {
@@ -522,8 +524,10 @@ class playGame extends Phaser.Scene {
     }
     //* Either eye collides with the player body
     else if (bodyA.label === 'body' && this.enemies[bodyB.label].isAlive) {
+      this.healthBar.damage(this.enemies[bodyB.label].bigEye ? 90 : 35);
       this.killEnemy(bodyB.label, false);
-      this.player.hit();
+      this.player.hit(); 
+      this.checkGameOver();
     }
     //* Eye eye collides with the melee
     else if (this.player.isMelee() && this.enemies[bodyB.label].isAlive && (bodyA.label === 'axe' || bodyA.label === 'melee')) {
@@ -562,6 +566,13 @@ class playGame extends Phaser.Scene {
       this.soundOff.setActive(false).setVisible(false);
       this.soundOn.setActive(true).setVisible(true);
       this.sound.volume = 0.5;
+    }
+  }
+
+  checkGameOver() {
+    if (this.healthBar.health <= 0) {
+      this.healthBar.restore();
+      return this.scene.start('gameOverScene', { score: this.score, best: this.best });
     }
   }
 

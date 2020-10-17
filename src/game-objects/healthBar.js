@@ -6,13 +6,15 @@ export default class HealthBar extends GameObjects.Container {
 
     this.scene = scene;
 
+    this.health = 100;
+
     this.healthBarLeftFrame = this.scene.add.sprite(103, 0, 'health_bar_left_frame');
 
     this.healthBarLeftEdge = this.scene.add.image(103, 0, 'health_bar_left_edge');
 
     this.healthBarMeterFrame = this.scene.add.image(103, 0, 'health_bar_meter_frame');
 
-    this.healthBarMeter = this.scene.add.image(this.healthBarMeterFrame.x, 350, 'health_bar_meter');
+    this.healthBarMeter = this.scene.add.image(this.healthBarMeterFrame.x, 0, 'health_bar_meter');
 
     Phaser.Display.Align.To.RightTop(this.healthBarMeterFrame, this.healthBarLeftEdge);
     Phaser.Display.Align.To.RightTop(this.healthBarMeter, this.healthBarLeftEdge);
@@ -41,11 +43,64 @@ export default class HealthBar extends GameObjects.Container {
     this.add(this.healthMeterBadge);
     this.add(this.healthMeterIcon);
 
-    this.healthBarMeter.setDisplaySize(222, this.healthBarMeter.height);
-    this.healthBarMeter.setX(this.healthBarMeter.x + 222 / 2 - 11);
+    this.healthBarMeter.setDisplaySize(this.healthBarMeter.width * 10, this.healthBarMeter.height);
+    this.healthBarMeter.setX(this.healthBarMeter.x + (this.healthBarMeter.width * 10) / 2 - this.healthBarMeter.width / 2);
+
+    this.healthWidth = this.healthBarMeter.displayWidth + this.healthBarMeter.displayWidth + this.healthBarRightEdge.displayWidth;
 
     this.setScale(0.7, 0.2);
 
     scene.add.existing(this);
+  }
+  damage(amount) {
+    this.health -= amount;
+
+    let healthWidth = this.healthWidth * (this.health / 100);
+
+    if (this.health <= 0) {
+      this.healthBarLeftEdge.displayWidth = 0; //* L
+      this.healthBarRightEdge.displayWidth = 0; //* R
+      this.healthBarMeter.displayWidth = 0; //* C
+    }
+
+    if (healthWidth <= this.healthBarLeftEdge.width) {
+      this.healthBarLeftEdge.displayWidth = healthWidth; //* L
+
+      this.healthBarMeter.displayWidth = 0; //* C
+
+      this.healthBarRightEdge.displayWidth = 0; //* R
+      
+    }
+    else if (healthWidth <= this.healthBarLeftEdge.width + this.healthBarMeter.width * 10) {
+      this.healthBarLeftEdge.displayWidth = this.healthBarLeftEdge.width; //* L
+
+      healthWidth -= this.healthBarLeftEdge.width;
+      
+      this.healthBarMeter.displayWidth = healthWidth; //* C
+      Phaser.Display.Align.To.RightTop(this.healthBarMeter, this.healthBarLeftEdge);
+
+      this.healthBarRightEdge.displayWidth = 0; //* R
+    }
+    else if (healthWidth <= this.healthWidth) {
+      this.healthBarLeftEdge.displayWidth = this.healthBarLeftEdge.width; //* L
+
+      this.healthBarMeter.setDisplaySize(this.healthBarMeter.width * 10, this.healthBarMeter.height); //* C
+      Phaser.Display.Align.To.RightTop(this.healthBarMeter, this.healthBarLeftEdge);
+
+      healthWidth -= (this.healthBarLeftEdge.width + this.healthBarMeter.width);
+
+      this.healthBarRightEdge.displayWidth = healthWidth; //* R
+      Phaser.Display.Align.To.RightTop(this.healthBarRightEdge, this.healthBarMeterFrame);
+      this.healthBarRightEdge.x -= healthWidth / 2;
+    }
+  }
+  restore() {
+    this.health = 100;
+    this.healthBarLeftEdge.displayWidth = 206;
+    this.healthBarMeter.displayWidth = 220;
+    this.healthBarMeter.setDisplaySize(this.healthBarMeter.width * 10, this.healthBarMeter.height); //* C
+    Phaser.Display.Align.To.RightTop(this.healthBarMeter, this.healthBarLeftEdge);
+    this.healthBarMeter.setX(this.healthBarMeter.x + (this.healthBarMeter.width * 10) / 2 - this.healthBarMeter.width / 2);
+    this.healthBarRightEdge.displayWidth = 206;
   }
 }
