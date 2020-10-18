@@ -17,6 +17,7 @@ import bigEyeKillSound from '../assets/sound/zapsplat_nature_water_pour_splatter
 import eyeKillSound from '../assets/sound/zapsplat_impact_body_heavy_splat_squelch_guts_bones_break_13492.mp3';
 import playerHitSound from '../assets/sound/horror_monster_zombie_male_groan_005.mp3';
 import skullHitSound from '../assets/sound/zapsplat_horror_zombie_male_groan_growl_11766.mp3';
+import scaryMusic from '../assets/sound/smartsound_CINEMATIC_HORROR_Piano_Bow_String_Broken_Low_Slow_01.mp3';
 // Game Objects
 import Player from '../game-objects/player';
 import EnergyBar from '../game-objects/energyBar';
@@ -157,6 +158,7 @@ class playGame extends Phaser.Scene {
     this.load.audio('eye_kill', eyeKillSound);
     this.load.audio('player_damaged', playerHitSound);
     this.load.audio('skull_damaged', skullHitSound);
+    this.load.audio('disturbing_piano_string', scaryMusic);
 
     alignGrid.create({ scene: this, rows: 10, columns: 10 });
     // Uncomment to see UI grid
@@ -169,7 +171,7 @@ class playGame extends Phaser.Scene {
     this.createAnimation('idle', 'ghost_warrior', 'idle', 1, 5, '.png', true, -1, 10);
     this.createAnimation('hit', 'ghost_warrior', 'hit', 1, 6, '.png', false, 0, 20);
     this.createAnimation('death', 'ghost_warrior', 'death', 1, 8, '.png', false, 30);
-    this.createAnimation('eye_twitch', 'eyeballs', 'eyeball', 1, 5, '.png', false, -1, 3);
+    this.createAnimation('eye_twitch', 'eyeballs', 'eyeball', 1, 5, '.png', false, 2, 3);
     this.createAnimation('blood_splatter', 'blood', 'blood', 0, 29, '.png', false, 0, 30);
 
     this.make.image({
@@ -181,35 +183,21 @@ class playGame extends Phaser.Scene {
       scale: { x: 1.5, y: 1.5 },
     });
 
-    //* Top
-    this.make
-      .sprite({
-        key: 'eyeballs',
-        x: 0,
-        y: 0,
-        flipY: true,
-        width: this.cameras.main.width * assetsDPR * 4,
-        origin: { x: 0, y: 0 },
-        scale: { x: 2.5, y: 2.5 },
-      })
-      .play('eye_twitch');
-
     //* Right
-    this.make
+    this.rightEye = this.make
       .sprite({
         key: 'eyeballs',
         x: this.cameras.main.width - this.cache.json.get('eyeballs').textures[0].size.h,
-        y: 0,
+        y: 100,
         flipX: true,
         height: this.cameras.main.height * assetsDPR,
         rotation: -Math.PI / 2,
         origin: { x: 1, y: 0 },
         scale: { x: 3, y: 5 },
-      })
-      .play('eye_twitch');
+      });
 
     //* Bottom
-    this.make
+    this.bottomEye = this.make
       .sprite({
         key: 'eyeballs',
         x: 0,
@@ -217,22 +205,26 @@ class playGame extends Phaser.Scene {
         width: this.cameras.main.width * assetsDPR,
         origin: { x: 0, y: 1 },
         scale: { x: 2.5, y: 2.5 },
-      })
-      .play('eye_twitch');
+      });
 
     //* Left
-    this.make
+    this.LeftEye = this.make
       .sprite({
         key: 'eyeballs',
         x: this.cache.json.get('eyeballs').textures[0].size.h,
-        y: 0,
+        y: 100,
         flipX: true,
         height: this.cameras.main.height * assetsDPR,
         rotation: Math.PI / 2,
         origin: { x: 0, y: 0 },
         scale: { x: 3, y: 5 },
-      })
-      .play('eye_twitch');
+      });
+
+    this.time.addEvent({ startAt: 1000, delay: 6000, callback: this.animateEyes, callbackScope: this });
+
+    this.events.on('wake', function() {
+      this.time.addEvent({ startAt: 1000, delay: 6000, callback: this.animateEyes, callbackScope: this });
+    }, this);
 
     this.healthBar = new HealthBar(this);
     this.energyBar = new EnergyBar(this);
@@ -371,6 +363,7 @@ class playGame extends Phaser.Scene {
       this.initEnemies();
       this.healthBar.restore();
       this.energyBar.restore();
+      this.sound.stopByKey('disturbing_piano_string');
       this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTargets;
       this.scene.launch('scoreScene');
     } else {
@@ -553,6 +546,13 @@ class playGame extends Phaser.Scene {
       yoyo,
       repeat,
     });
+  }
+
+  animateEyes() {
+    this.LeftEye.play('eye_twitch');
+    this.rightEye.play('eye_twitch');
+    this.bottomEye.play('eye_twitch');
+    this.sound.play('disturbing_piano_string');
   }
 
   onToggleSound(pointer, x, y, e) {
