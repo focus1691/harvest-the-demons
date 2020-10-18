@@ -81,7 +81,7 @@ class playGame extends Phaser.Scene {
       },
       {
         targets: 0,
-        bigTargets: 20,
+        bigTargets: 10,
         minDelay: 1000,
         maxDelay: 2000,
         duration: 4000,
@@ -95,7 +95,7 @@ class playGame extends Phaser.Scene {
       },
       {
         targets: 0,
-        bigTargets: 15,
+        bigTargets: 5,
         minDelay: 500,
         maxDelay: 1500,
         duration: 3000,
@@ -171,7 +171,7 @@ class playGame extends Phaser.Scene {
     this.createAnimation('idle', 'ghost_warrior', 'idle', 1, 5, '.png', true, -1, 10);
     this.createAnimation('hit', 'ghost_warrior', 'hit', 1, 6, '.png', false, 0, 20);
     this.createAnimation('death', 'ghost_warrior', 'death', 1, 8, '.png', false, 30);
-    this.createAnimation('eye_twitch', 'eyeballs', 'eyeball', 1, 5, '.png', false, 2, 3);
+    this.createAnimation('eye_twitch', 'eyeballs', 'eyeball', 1, 5, '.png', false, 1, 3);
     this.createAnimation('blood_splatter', 'blood', 'blood', 0, 29, '.png', false, 0, 30);
 
     this.make.image({
@@ -225,6 +225,8 @@ class playGame extends Phaser.Scene {
     this.events.on('wake', function() {
       this.time.addEvent({ startAt: 1000, delay: 6000, callback: this.animateEyes, callbackScope: this });
     }, this);
+
+    this.LeftEye.on('animationcomplete', this.eyeAnimComplete, this);
 
     this.healthBar = new HealthBar(this);
     this.energyBar = new EnergyBar(this);
@@ -549,10 +551,14 @@ class playGame extends Phaser.Scene {
   }
 
   animateEyes() {
+    this.sound.play('disturbing_piano_string');
     this.LeftEye.play('eye_twitch');
     this.rightEye.play('eye_twitch');
     this.bottomEye.play('eye_twitch');
-    this.sound.play('disturbing_piano_string');
+  }
+
+  eyeAnimComplete() {
+    this.sound.stopByKey('disturbing_piano_string');
   }
 
   onToggleSound(pointer, x, y, e) {
