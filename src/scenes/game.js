@@ -235,7 +235,6 @@ class playGame extends Phaser.Scene {
       .play('eye_twitch');
 
     this.healthBar = new HealthBar(this);
-    // this.healthBar.damage(60);
     this.energyBar = new EnergyBar(this);
 
     this.input.mouse.disableContextMenu();
@@ -361,7 +360,6 @@ class playGame extends Phaser.Scene {
   }
 
   roundOver() {
-    console.log('round over');
     if (this.score > this.best) {
       localStorage.setItem('best_score', this.score);
       this.best = this.score;
@@ -372,6 +370,7 @@ class playGame extends Phaser.Scene {
       this.removeEnemies();
       this.initEnemies();
       this.healthBar.restore();
+      this.energyBar.restore();
       this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTargets;
       this.scene.launch('scoreScene');
     } else {

@@ -46,24 +46,24 @@ export default class HealthBar extends GameObjects.Container {
     this.healthBarMeter.setDisplaySize(this.healthBarMeter.width * 10, this.healthBarMeter.height);
     this.healthBarMeter.setX(this.healthBarMeter.x + (this.healthBarMeter.width * 10) / 2 - this.healthBarMeter.width / 2);
 
-    this.healthWidth = this.healthBarMeter.displayWidth + this.healthBarMeter.displayWidth + this.healthBarRightEdge.displayWidth;
+    this.healthWidth = this.healthBarLeftEdge.displayWidth + this.healthBarMeter.displayWidth + this.healthBarRightEdge.displayWidth;
 
     this.setScale(0.7, 0.2);
 
     scene.add.existing(this);
   }
   damage(amount) {
-    this.health -= amount;
+    this.health = Math.max(this.health - amount, 0);
 
     let healthWidth = this.healthWidth * (this.health / 100);
 
-    if (this.health <= 0) {
+    if (this.health === 0) {
       this.healthBarLeftEdge.displayWidth = 0; //* L
       this.healthBarRightEdge.displayWidth = 0; //* R
       this.healthBarMeter.displayWidth = 0; //* C
     }
 
-    if (healthWidth <= this.healthBarLeftEdge.width) {
+    else if (healthWidth <= this.healthBarLeftEdge.width) {
       this.healthBarLeftEdge.displayWidth = healthWidth; //* L
 
       this.healthBarMeter.displayWidth = 0; //* C
