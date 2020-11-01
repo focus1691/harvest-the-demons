@@ -1,6 +1,6 @@
 import { assetsDPR } from '../index';
 
-export default class Skull extends Phaser.Physics.Matter.Sprite {
+export default class Skull extends Phaser.Physics.PhaserPlanck.Sprite {
   constructor(config) {
     super(config.world, config.x, config.y, config.key, null, { shape: config.shape });
 

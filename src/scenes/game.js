@@ -21,9 +21,9 @@ import scaryMusic from '../assets/sound/smartsound_CINEMATIC_HORROR_Piano_Bow_St
 // Game Objects
 import Player from '../game-objects/player';
 import EnergyBar from '../game-objects/energyBar';
-import Eyeball from '../game-objects/eyeball';
+// import Eyeball from '../game-objects/eyeball';
 import HealthBar from '../game-objects/healthBar';
-import Skull from '../game-objects/skull';
+// import Skull from '../game-objects/skull';
 //* Physics
 import ghostWarriorShape from '../assets/PhysicsEditor/ghost_warrior.json';
 import skullShape from '../assets/PhysicsEditor/skull.json';
@@ -245,14 +245,15 @@ class playGame extends Phaser.Scene {
     graphics.setAlpha(0.1);
 
     //* Skull
-    this.skull = new Skull({ world: this.matter.world, x: 0, y: 0, key: 'skull', shape: this.cache.json.get('skull_shapes').skull, circleX, circleY, circleR });
+    // this.skull = new Skull({ world: this.planck.world, x: 0, y: 0, key: 'skull', shape: this.cache.json.get('skull_shapes').skull, circleX, circleY, circleR });
+    this.skull = this.planck.add.sprite(0, 0, 'skull');
 
     alignGrid.center(this.skull);
 
     //* Ghost Warrior
     var shapes = this.cache.json.get('ghost_warrior_shapes');
 
-    this.player = new Player(this, { world: this.matter.world, x: 400, y: 150, key: 'ghost_warrior', shape: shapes.main_body });
+    this.player = new Player(this, { world: this.planck.world, x: 400, y: 150, key: 'ghost_warrior', shape: shapes.main_body });
 
     Phaser.Display.Align.In.Center(this.player, this.add.zone(400, 300, 800, 600));
 
@@ -322,7 +323,7 @@ class playGame extends Phaser.Scene {
       this
     );
 
-    this.matter.world.on(
+    this.planck.world.on(
       'collisionstart',
       function (event, bodyA, bodyB) {
         this.handleCollision(bodyA, bodyB);
@@ -437,15 +438,17 @@ class playGame extends Phaser.Scene {
   createEnemy(delay, min, max, duration, bigEye) {
     const { x, y } = this.getEnemyPosition(Between(1, 4));
     const key = uuidv4();
-    this.enemies[key] = new Eyeball({
-      world: this.matter.world,
-      x,
-      y,
-      key: 'demon_eye',
-      label: key,
-      bigEye,
-    });
-    this.enemies[key].body.angle = Math.atan2(y - this.skull.y, x - this.skull.x);
+    // this.enemies[key] = new Eyeball({
+    //   world: this.planck.world,
+    //   x,
+    //   y,
+    //   key: 'demon_eye',
+    //   label: key,
+    //   bigEye,
+    // });
+
+    this.enemies[key] = this.planck.add.sprite(x, y, 'demon_eye');
+    // this.enemies[key].body.angle = Math.atan2(y - this.skull.y, x - this.skull.x);
     delay += Between(min, max);
 
     this.enemies[key].tween = this.tweens.add({

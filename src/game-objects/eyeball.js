@@ -1,6 +1,6 @@
 import { assetsDPR } from '..';
 
-export default class Enemy extends Phaser.Physics.Matter.Sprite {
+export default class Enemy extends Phaser.Physics.PhaserPlanck {
   constructor(config) {
     super(config.world, config.x, config.y, config.key);
 

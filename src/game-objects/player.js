@@ -10,23 +10,23 @@ export default class Player {
     this.x = config.x;
     this.y = config.y;
 
-    this.left = scene.matter.add.sprite(config.x, config.y, config.key, null, { shape: config.shape, render: { sprite: { xOffset: 0.5, yOffset: 0 } } });
-    this.right = scene.matter.add.sprite(config.x, config.y, config.key, null, { shape: config.shape });
+    this.left = scene.planck.add.sprite(config.x, config.y, config.key, null, { shape: config.shape, render: { sprite: { xOffset: 0.5, yOffset: 0 } } });
+    this.right = scene.planck.add.sprite(config.x, config.y, config.key, null, { shape: config.shape });
 
     this.right.setVisible(false);
-    this.right.setToSleep();
+    // this.right.setToSleep();
 
-    this.left.body.label = 'player';
-    this.right.body.label = 'player';
+    // this.left.body.label = 'player';
+    // this.right.body.label = 'player';
 
-    this.left.body.ignoreGravity = true;
-    this.right.body.ignoreGravity = true;
+    // this.left.body.ignoreGravity = true;
+    // this.right.body.ignoreGravity = true;
 
-    this.left.setMass(1000);
-    this.right.setMass(1000);
+    // this.left.setMass(1000);
+    // this.right.setMass(1000);
 
-    this.left.setScale(0.5 * assetsDPR, 0.5 * assetsDPR);
-    this.right.setScale(0.5 * assetsDPR, 0.5 * assetsDPR);
+    // this.left.setScale(0.5 * assetsDPR, 0.5 * assetsDPR);
+    // this.right.setScale(0.5 * assetsDPR, 0.5 * assetsDPR);
 
     //	Just the one listener:
     this.left.on('animationupdate-attack', this.onMeleeAnimation, this);
@@ -34,9 +34,9 @@ export default class Player {
 
     this.right.flipX = true;
 
-    this.scene.matter.body.scale(this.right.body, -1, 1);
-    this.scene.matter.body.setCentre(this.right.body, { x: 70, y: 150 }, false);
-    this.scene.matter.body.setCentre(this.left.body, { x: 340, y: 0 }, true);
+    // this.scene.planck.body.scale(this.right.body, -1, 1);
+    // this.scene.planck.body.setCentre(this.right.body, { x: 70, y: 150 }, false);
+    // this.scene.planck.body.setCentre(this.left.body, { x: 340, y: 0 }, true);
 
     this.left.play('fly');
     this.right.play('fly');
@@ -102,13 +102,13 @@ export default class Player {
         this.left.setVisible(true);
         this.right.setVisible(false);
 
-        this.left.setAwake();
-        this.right.setToSleep();
+        // this.left.setAwake();
+        // this.right.setToSleep();
       } else {
         this.right.setRotation(lineAngle);
 
-        this.left.setToSleep();
-        this.right.setAwake();
+        // this.left.setToSleep();
+        // this.right.setAwake();
 
         this.left.setVisible(false);
         this.right.setVisible(true);
@@ -123,8 +123,8 @@ export default class Player {
         this.left.setVisible(true);
         this.right.setVisible(false);
 
-        this.left.setAwake();
-        this.right.setToSleep();
+        // this.left.setAwake();
+        // this.right.setToSleep();
       } else if (angleDeg < 0 && angleDeg > -120) {
         //	Merging top left
         merging = 3;
@@ -134,16 +134,16 @@ export default class Player {
         this.left.setVisible(false);
         this.right.setVisible(true);
 
-        this.left.setToSleep();
-        this.right.setAwake();
+        // this.left.setToSleep();
+        // this.right.setAwake();
       } else {
         this.right.setRotation(reflectAngle - Phaser.Math.DegToRad(30));
 
         this.left.setVisible(true);
         this.right.setVisible(false);
 
-        this.left.setAwake();
-        this.right.setToSleep();
+        // this.left.setAwake();
+        // this.right.setToSleep();
       }
     }
 
