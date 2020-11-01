@@ -6,7 +6,6 @@ import scoreScene from './scenes/score';
 import gameOverScene from './scenes/gameOver';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import { alignGrid } from './assets/configs/alignGrid';
-import PhaserPlanck from 'phaser3-planck'
 
 const roundHalf = (num) => Math.round(num * 2) / 2;
 const DPR = window.devicePixelRatio;
@@ -31,7 +30,8 @@ const config = {
     autoCenter: Phaser.DOM.CENTER_BOTH,
   },
   physics: {
-    planck: {
+    default: 'matter',
+    matter: {
       debug: false,
     },
   },
@@ -44,7 +44,6 @@ const config = {
         mapping: 'rexUI',
         start: true,
       },
-      { key: 'PhaserPlanck', plugin: PhaserPlanck, mapping: 'planck' },
     ],
   },
 };

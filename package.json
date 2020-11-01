@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "phaser": "^3.24.1",
-    "phaser3-planck": "0.0.4",
     "phaser3-rex-plugins": "^1.1.26",
     "uuid": "^8.3.0"
   }
