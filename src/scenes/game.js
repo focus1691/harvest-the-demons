@@ -1,3 +1,4 @@
+import * as Planck from 'planck-js';
 // Images
 import backgroundImg from '../assets/images/background.jpg';
 import demonEyeImg from '../assets/images/demon-eye.png';
@@ -57,6 +58,10 @@ class playGame extends Phaser.Scene {
     super('playGame');
   }
   init({ level }) {
+    this.gravity = {
+      x: 0,
+      y: 0,
+    };
     this.accumMS = 0;
     this.hzMS = (1 / 60) * 1000;
     this.afk = false;
@@ -165,6 +170,33 @@ class playGame extends Phaser.Scene {
     // alignGrid.showNumbers();
   }
   create() {
+    this.world = new Planck.World(Planck.Vec2(this.gravity.x, this.gravity.y));
+    this.scaleFactor = 30;
+
+    // Planck event bindings
+    this.world.on('pre-solve', (contact, oldManifold) => {
+      // this.sprites.forEach((s) => s.preSolve(contact, oldManifold))
+    })
+    this.world.on('post-solve', (contact, oldManifold) => {
+      // this.sprites.forEach((s) => s.postSolve(contact, oldManifold))
+    })
+    this.world.on('begin-contact', (contact, oldManifold) => {
+      // const a = this.sprites.filter((s) => s.fixture === contact.getFixtureA())[0]
+      // const b = this.sprites.filter((s) => s.fixture === contact.getFixtureB())[0]
+      const a = contact.getFixtureA();
+      const b = contact.getFixtureB();
+      console.log(a.getUserData());
+      console.log(b.getUserData());
+      // a.emit('collision-start', b)
+      // b.emit('collision-start', a)
+    })
+    this.world.on('end-contact', (contact, oldManifold) => {
+      // const a = this.sprites.filter((s) => s.fixture === contact.getFixtureA())[0]
+      // const b = this.sprites.filter((s) => s.fixture === contact.getFixtureB())[0]
+      // a.emit('collision-end', b)
+      // b.emit('collision-end', a)
+    })
+
     //* Create the animations
     this.createAnimation('fly', 'ghost_warrior', 'fly', 1, 5, '.png', true, -1, 10);
     this.createAnimation('attack', 'ghost_warrior', 'Attack', 1, 11, '.png', false, 0, 40);
@@ -184,47 +216,48 @@ class playGame extends Phaser.Scene {
     });
 
     //* Right
-    this.rightEye = this.make
-      .sprite({
-        key: 'eyeballs',
-        x: this.cameras.main.width - this.cache.json.get('eyeballs').textures[0].size.h,
-        y: 100,
-        flipX: true,
-        height: this.cameras.main.height * assetsDPR,
-        rotation: -Math.PI / 2,
-        origin: { x: 1, y: 0 },
-        scale: { x: 3, y: 5 },
-      });
+    this.rightEye = this.make.sprite({
+      key: 'eyeballs',
+      x: this.cameras.main.width - this.cache.json.get('eyeballs').textures[0].size.h,
+      y: 100,
+      flipX: true,
+      height: this.cameras.main.height * assetsDPR,
+      rotation: -Math.PI / 2,
+      origin: { x: 1, y: 0 },
+      scale: { x: 3, y: 5 },
+    });
 
     //* Bottom
-    this.bottomEye = this.make
-      .sprite({
-        key: 'eyeballs',
-        x: 0,
-        y: this.cameras.main.height,
-        width: this.cameras.main.width * assetsDPR,
-        origin: { x: 0, y: 1 },
-        scale: { x: 2.5, y: 2.5 },
-      });
+    this.bottomEye = this.make.sprite({
+      key: 'eyeballs',
+      x: 0,
+      y: this.cameras.main.height,
+      width: this.cameras.main.width * assetsDPR,
+      origin: { x: 0, y: 1 },
+      scale: { x: 2.5, y: 2.5 },
+    });
 
     //* Left
-    this.LeftEye = this.make
-      .sprite({
-        key: 'eyeballs',
-        x: this.cache.json.get('eyeballs').textures[0].size.h,
-        y: 100,
-        flipX: true,
-        height: this.cameras.main.height * assetsDPR,
-        rotation: Math.PI / 2,
-        origin: { x: 0, y: 0 },
-        scale: { x: 3, y: 5 },
-      });
+    this.LeftEye = this.make.sprite({
+      key: 'eyeballs',
+      x: this.cache.json.get('eyeballs').textures[0].size.h,
+      y: 100,
+      flipX: true,
+      height: this.cameras.main.height * assetsDPR,
+      rotation: Math.PI / 2,
+      origin: { x: 0, y: 0 },
+      scale: { x: 3, y: 5 },
+    });
 
     this.time.addEvent({ startAt: 1000, delay: 6000, callback: this.animateEyes, callbackScope: this });
 
-    this.events.on('wake', function() {
-      this.time.addEvent({ startAt: 1000, delay: 6000, callback: this.animateEyes, callbackScope: this });
-    }, this);
+    this.events.on(
+      'wake',
+      function () {
+        this.time.addEvent({ startAt: 1000, delay: 6000, callback: this.animateEyes, callbackScope: this });
+      },
+      this
+    );
 
     this.LeftEye.on('animationcomplete', this.eyeAnimComplete, this);
 
@@ -245,18 +278,23 @@ class playGame extends Phaser.Scene {
     graphics.setAlpha(0.1);
 
     //* Skull
-    this.skull = new Skull({ world: this.matter.world, x: 0, y: 0, key: 'skull', shape: this.cache.json.get('skull_shapes').skull, circleX, circleY, circleR });
+    // this.skull = new Skull({ world: this.matter.world, x: 0, y: 0, key: 'skull', shape: this.cache.json.get('skull_shapes').skull, circleX, circleY, circleR });
+    this.skull = new Skull({ scene: this, x: 0, y: 0, key: 'skull', shapeData: this.cache.json.get('skull_shapes').skull, circleX, circleY, circleR });
+    this.skull.setPosition(this.targetLine.x1, this.targetLine.y1);
 
-    alignGrid.center(this.skull);
+    // alignGrid.center(this.skull);
 
     //* Ghost Warrior
     var shapes = this.cache.json.get('ghost_warrior_shapes');
 
-    this.player = new Player(this, { world: this.matter.world, x: 400, y: 150, key: 'ghost_warrior', shape: shapes.main_body });
+    // this.player = new Player(this, { world: this.matter.world, x: 400, y: 150, key: 'ghost_warrior', shape: shapes.main_body });
+    this.player = new Player(this, 0, 0, 'ghost_warrior', shapes.main_body);
+    this.player.left.drawDebug();
+    this.player.right.drawDebug();
 
-    Phaser.Display.Align.In.Center(this.player, this.add.zone(400, 300, 800, 600));
+    // Phaser.Display.Align.In.Center(this.player, this.add.zone(400, 300, 800, 600));
 
-    Phaser.Display.Align.In.TopCenter(this.player, this.skull);
+    // Phaser.Display.Align.In.TopCenter(this.player, this.skull);
 
     this.scoreText = this.make.text({
       x: 0,
@@ -322,13 +360,13 @@ class playGame extends Phaser.Scene {
       this
     );
 
-    this.matter.world.on(
-      'collisionstart',
-      function (event, bodyA, bodyB) {
-        this.handleCollision(bodyA, bodyB);
-      },
-      this
-    );
+    // this.matter.world.on(
+    //   'collisionstart',
+    //   function (event, bodyA, bodyB) {
+    //     this.handleCollision(bodyA, bodyB);
+    //   },
+    //   this
+    // );
 
     this.initEnemies();
 
@@ -350,6 +388,8 @@ class playGame extends Phaser.Scene {
 
     while (this.accumMS >= this.hzMS) {
       this.accumMS -= this.hzMS;
+      this.world.step(1 / 30);
+      this.world.clearForces();
     }
   }
 
@@ -438,14 +478,16 @@ class playGame extends Phaser.Scene {
     const { x, y } = this.getEnemyPosition(Between(1, 4));
     const key = uuidv4();
     this.enemies[key] = new Eyeball({
-      world: this.matter.world,
+      // world: this.matter.world,
+      scene: this,
       x,
       y,
       key: 'demon_eye',
       label: key,
       bigEye,
     });
-    this.enemies[key].body.angle = Math.atan2(y - this.skull.y, x - this.skull.x);
+    // this.enemies[key].body.angle = Math.atan2(y - this.skull.y, x - this.skull.x);
+    this.enemies[key].body.setAngle(Math.atan2(y - this.skull.y, x - this.skull.x));
     delay += Between(min, max);
 
     this.enemies[key].tween = this.tweens.add({
@@ -469,10 +511,10 @@ class playGame extends Phaser.Scene {
       delay,
       duration,
       onComplete: function () {
-        this.killEnemy(key, false);
+        // this.killEnemy(key, false);
         this.lives -= 1;
         this.sound.play('skull_damaged');
-        this.cameras.main.shake(200);
+        // this.cameras.main.shake(200);
       }.bind(this),
     });
     return delay;
@@ -497,43 +539,43 @@ class playGame extends Phaser.Scene {
     return { x: Between(0, W / 2 - 75 * assetsDPR * 2), y: 0 };
   }
 
-  handleCollision(bodyA, bodyB) {
-    if ((bodyA.label === 'skull' && bodyB.label.length <= 5) || (playerShapeKeys.includes(bodyA.label) && playerShapeKeys.includes(bodyB.label))) return;
-    //* Any eye collides with the skull
-    if (bodyA.label === 'skull' && bodyB.label.length > 5 && this.enemies[bodyB.label].isAlive) {
-      this.killEnemy(bodyB.label, false);
-      this.lives -= 1;
-      this.sound.play('skull_damaged');
-      if (this.remainingTargets > 0) {
-        this.cameras.main.shake(200);
-        return;
-      }
-    }
-    //* Small eye collides with the player axe
-    else if (bodyA.label === 'axe' && !this.afk && this.enemies[bodyB.label].isAlive && !this.enemies[bodyB.label].bigEye && !this.player.isAttacking()) {
-      this.killEnemy(bodyB.label, true);
-      this.score++;
-      this.scoreText.setText(`${this.score}`);
-      this.sound.play('eye_kill');
-    }
-    //* Either eye collides with the player body
-    else if (bodyA.label === 'body' && this.enemies[bodyB.label].isAlive) {
-      this.healthBar.damage(this.enemies[bodyB.label].bigEye ? 90 : 35);
-      this.killEnemy(bodyB.label, false);
-      this.player.hit(); 
-      this.checkGameOver();
-    }
-    //* Eye eye collides with the melee
-    else if (this.player.isMelee() && this.enemies[bodyB.label].isAlive && (bodyA.label === 'axe' || bodyA.label === 'melee')) {
-      this.sound.play(this.enemies[bodyB.label].bigEye ? 'big_eye_kill' : 'eye_kill');
-      this.killEnemy(bodyB.label, true);
-      this.score++;
-      this.scoreText.setText(`${this.score}`);
-    }
-    if (this.remainingTargets === 0) {
-      this.roundOver();
-    }
-  }
+  // handleCollision(bodyA, bodyB) {
+  //   if ((bodyA.label === 'skull' && bodyB.label.length <= 5) || (playerShapeKeys.includes(bodyA.label) && playerShapeKeys.includes(bodyB.label))) return;
+  //   //* Any eye collides with the skull
+  //   if (bodyA.label === 'skull' && bodyB.label.length > 5 && this.enemies[bodyB.label].isAlive) {
+  //     this.killEnemy(bodyB.label, false);
+  //     this.lives -= 1;
+  //     this.sound.play('skull_damaged');
+  //     if (this.remainingTargets > 0) {
+  //       this.cameras.main.shake(200);
+  //       return;
+  //     }
+  //   }
+  //   //* Small eye collides with the player axe
+  //   else if (bodyA.label === 'axe' && !this.afk && this.enemies[bodyB.label].isAlive && !this.enemies[bodyB.label].bigEye && !this.player.isAttacking()) {
+  //     this.killEnemy(bodyB.label, true);
+  //     this.score++;
+  //     this.scoreText.setText(`${this.score}`);
+  //     this.sound.play('eye_kill');
+  //   }
+  //   //* Either eye collides with the player body
+  //   else if (bodyA.label === 'body' && this.enemies[bodyB.label].isAlive) {
+  //     this.healthBar.damage(this.enemies[bodyB.label].bigEye ? 90 : 35);
+  //     this.killEnemy(bodyB.label, false);
+  //     this.player.hit();
+  //     this.checkGameOver();
+  //   }
+  //   //* Eye eye collides with the melee
+  //   else if (this.player.isMelee() && this.enemies[bodyB.label].isAlive && (bodyA.label === 'axe' || bodyA.label === 'melee')) {
+  //     this.sound.play(this.enemies[bodyB.label].bigEye ? 'big_eye_kill' : 'eye_kill');
+  //     this.killEnemy(bodyB.label, true);
+  //     this.score++;
+  //     this.scoreText.setText(`${this.score}`);
+  //   }
+  //   if (this.remainingTargets === 0) {
+  //     this.roundOver();
+  //   }
+  // }
 
   createAnimation(key, name, prefix, start, end, suffix, yoyo, repeat, frameRate) {
     this.anims.create({

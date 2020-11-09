@@ -29,12 +29,12 @@ const config = {
     mode: Phaser.DOM.FIT,
     autoCenter: Phaser.DOM.CENTER_BOTH,
   },
-  physics: {
-    default: 'matter',
-    matter: {
-      debug: false,
-    },
-  },
+  // physics: {
+  //   default: 'matter',
+  //   matter: {
+  //     debug: false,
+  //   },
+  // },
   scene: [titleScene, playGame, scoreScene, gameOverScene],
   plugins: {
     scene: [

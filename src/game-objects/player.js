@@ -1,30 +1,43 @@
 import { assetsDPR } from '../index';
+import Sprite from './sprite';
 
 export default class Player {
-  constructor(scene, config) {
+  constructor(scene, x, y, key, shapes) {
     this.scene = scene;
 
     this.lastAttack = new Date();
     this.fatigued = false;
 
-    this.x = config.x;
-    this.y = config.y;
+    // this.x = config.x;
+    // this.y = config.y;
+    this.x = x;
+    this.y = y;
 
-    this.left = scene.matter.add.sprite(config.x, config.y, config.key, null, { shape: config.shape, render: { sprite: { xOffset: 0.5, yOffset: 0 } } });
-    this.right = scene.matter.add.sprite(config.x, config.y, config.key, null, { shape: config.shape });
+    // this.left = scene.matter.add.sprite(config.x, config.y, config.key, null, { shape: config.shape, render: { sprite: { xOffset: 0.5, yOffset: 0 } } });
+    // this.right = scene.matter.add.sprite(config.x, config.y, config.key, null, { shape: config.shape });
+    this.left = new Sprite(scene, x, y, key);
+    this.right = new Sprite(scene, x, y, key);
+    // this.left.setOrigin(1, 0.5);
+    // this.right.setOrigin(0.5, 0.5);
+
+    this.left.setBody(shapes);
+    this.right.setBody(shapes);
 
     this.right.setVisible(false);
-    this.right.setToSleep();
+    // this.right.setToSleep();
+    this.right.body.setAwake(false);
 
     this.left.body.label = 'player';
     this.right.body.label = 'player';
+    console.log(this.left.body);
 
-    this.left.body.ignoreGravity = true;
-    this.right.body.ignoreGravity = true;
+    // this.left.body.ignoreGravity = true;
+    // this.right.body.ignoreGravity = true;
 
-    this.left.setMass(1000);
-    this.right.setMass(1000);
+    // this.left.setMass(1000);
+    // this.right.setMass(1000);
 
+    //TODO replace scale
     this.left.setScale(0.5 * assetsDPR, 0.5 * assetsDPR);
     this.right.setScale(0.5 * assetsDPR, 0.5 * assetsDPR);
 
@@ -34,12 +47,16 @@ export default class Player {
 
     this.right.flipX = true;
 
-    this.scene.matter.body.scale(this.right.body, -1, 1);
-    this.scene.matter.body.setCentre(this.right.body, { x: 70, y: 150 }, false);
-    this.scene.matter.body.setCentre(this.left.body, { x: 340, y: 0 }, true);
+    //TODO replace scale
+    // this.scene.matter.body.scale(this.right.body, -1, 1);
+    // this.scene.matter.body.setCentre(this.right.body, { x: 70, y: 150 }, false);
+    // this.scene.matter.body.setCentre(this.left.body, { x: 340, y: 0 }, true);
 
     this.left.play('fly');
     this.right.play('fly');
+
+    // this.scene.add.existing(this.left);
+    // this.scene.add.existing(this.right);
 
     this.midLine = new Phaser.Geom.Line();
     this.reflectedLine = new Phaser.Geom.Line();
@@ -77,6 +94,12 @@ export default class Player {
     var lineAngle = Phaser.Geom.Line.Angle(targetLine);
     var angleDeg = Phaser.Math.RadToDeg(lineAngle);
 
+    // console.log({
+    //   lineAngle,
+    //   angleDeg,
+    // })
+
+    //? Keep this
     this.left.setPosition(targetLine.x1, targetLine.y1);
     this.right.setPosition(targetLine.x1, targetLine.y1);
 
@@ -97,57 +120,80 @@ export default class Player {
         //	Merging bottom right
         merging = 1;
 
-        this.right.setRotation(Phaser.Math.DegToRad(70) + (Phaser.Math.DegToRad(70) - lineAngle));
+        // this.right.setRotation(Phaser.Math.DegToRad(70) + (Phaser.Math.DegToRad(70) - lineAngle));
+        // this.right.body.setAngle(Phaser.Math.RadToDeg(Phaser.Math.DegToRad(70) + (Phaser.Math.DegToRad(70) - lineAngle)));
+        this.right.body.setAngle(Phaser.Math.DegToRad(70) + (Phaser.Math.DegToRad(70) - lineAngle));
 
         this.left.setVisible(true);
         this.right.setVisible(false);
 
-        this.left.setAwake();
-        this.right.setToSleep();
+        // this.left.setAwake();
+        // this.right.setToSleep();
+        this.left.body.setAwake(true);
+        this.right.body.setAwake(false);
       } else {
-        this.right.setRotation(lineAngle);
-
-        this.left.setToSleep();
-        this.right.setAwake();
+        // this.right.setRotation(lineAngle);
+        // this.right.body.setAngle(angleDeg);
+        this.right.body.setAngle(lineAngle);
 
         this.left.setVisible(false);
         this.right.setVisible(true);
+
+        // this.left.setToSleep();
+        // this.right.setAwake();
+        this.left.body.setAwake(false);
+        this.right.body.setAwake(true);
       }
     } else if (leftQuadrant) {
       if (angleDeg >= 90 && angleDeg < 110) {
         //	Merging bottom left
         merging = 2;
 
-        this.right.setRotation(Phaser.Math.DegToRad(70) + (Phaser.Math.DegToRad(70) - lineAngle));
+        // this.right.setRotation(Phaser.Math.DegToRad(70) + (Phaser.Math.DegToRad(70) - lineAngle));
+        // this.right.body.setAngle(Phaser.Math.RadToDeg(Phaser.Math.DegToRad(70) + (Phaser.Math.DegToRad(70) - lineAngle)));
+        this.right.body.setAngle(Phaser.Math.DegToRad(70) + (Phaser.Math.DegToRad(70) - lineAngle));
 
         this.left.setVisible(true);
         this.right.setVisible(false);
 
-        this.left.setAwake();
-        this.right.setToSleep();
+        // this.left.setAwake();
+        // this.right.setToSleep();
+        this.left.body.setAwake(true);
+        this.right.body.setAwake(false);
       } else if (angleDeg < 0 && angleDeg > -120) {
         //	Merging top left
         merging = 3;
 
-        this.right.setRotation(lineAngle);
+        // this.right.setRotation(lineAngle);
+        // this.right.body.setAngle(angleDeg);
+        this.right.body.setAngle(lineAngle);
 
         this.left.setVisible(false);
         this.right.setVisible(true);
 
-        this.left.setToSleep();
-        this.right.setAwake();
+        // this.left.setToSleep();
+        // this.right.setAwake();
+        this.left.body.setAwake(false);
+        this.right.body.setAwake(true);
       } else {
-        this.right.setRotation(reflectAngle - Phaser.Math.DegToRad(30));
+        // this.right.setRotation(reflectAngle - Phaser.Math.DegToRad(30));
+        // this.right.body.setAngle(Phaser.Math.RadToDeg(reflectAngle - Phaser.Math.DegToRad(30)));
+        this.right.body.setAngle(reflectAngle - Phaser.Math.DegToRad(30));
 
         this.left.setVisible(true);
         this.right.setVisible(false);
 
-        this.left.setAwake();
-        this.right.setToSleep();
+        // this.left.setAwake();
+        // this.right.setToSleep();
+        this.left.body.setAwake(true);
+        this.right.body.setAwake(false);
       }
     }
 
-    this.left.setRotation(-this.right.rotation);
+    // this.left.setRotation(-this.right.rotation);
+    // this.left.body.setAngle(Phaser.Math.RadToDeg(-this.right.rotation));
+    // this.left.body.setAngle(-this.right.body.angle);
+    this.left.body.setAngle(-this.right.rotation);
 
     let timeSinceLastAttack = new Date().getTime() - this.lastAttack.getTime();
     if (this.fatigued) {
