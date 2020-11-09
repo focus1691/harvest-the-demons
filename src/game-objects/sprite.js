@@ -54,6 +54,8 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
     //   density: this.opts.density || 1.0,
     // };
 
+    this.points = [];
+
     const fixtureOptions = {
       friction: data.friction || 0.0,
       restitution: data.restitution || 0.0,
@@ -62,15 +64,17 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
 
     if (typeof data === 'string') {
       if (data === 'box') {
-        const fixture = this.body.createFixture(Planck.Box(this.displayWidth / 2 / this.scene.scaleFactor, this.displayHeight / 2 / this.scene.scaleFactor), { ...fixtureOptions, userData: this.name });
+        this.type = 'box';
+        const fixture = this.body.createFixture(Planck.Box(this.displayWidth / 2 / this.scene.scaleFactor, this.displayHeight / 2 / this.scene.scaleFactor), { ...fixtureOptions, isSensor: true, userData: this.name });
         // this.body.setPosition(Planck.Vec2((this.x + this.displayWidth / 2) / this.scene.scaleFactor, (this.y - this.displayHeight / 2) / this.scene.scaleFactor));
         // this.body.setPosition(Planck.Vec2((this.x + this.displayWidth / 2) / this.scene.scaleFactor, (this.y - this.displayHeight / 2) / this.scene.scaleFactor));
         this.fixtures.push(fixture);
       }
     } else {
+      this.type = 'multi';
       for (var i = 0; i < data.fixtures.length; i++) {
         if (data.fixtures[i].circle) {
-          let fixture = this.body.createFixture(Planck.Circle(data.fixtures[i].circle.radius / 2 / this.scene.scaleFactor), { ...fixtureOptions, userData: data.fixtures[i].label });
+          let fixture = this.body.createFixture(Planck.Circle(data.fixtures[i].circle.radius / 2 / this.scene.scaleFactor), { ...fixtureOptions, isSensor: data.fixtures[i].isSensor, userData: data.fixtures[i].label });
           // this.body.setPosition(Planck.Vec2(data.fixtures[i].circle.x / this.scene.scaleFactor, data.fixtures[i].circle.y / this.scene.scaleFactor));
           // this.body.setPosition(Planck.Vec2(this.x / this.scene.scaleFactor, this.y / this.scene.scaleFactor));
           this.fixtures.push(fixture);
@@ -88,14 +92,14 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
   
               let { x, y } = data.fixtures[i].vertices[j][k];
   
-              vertices.push(new Planck.Vec2((x - this.displayWidth / 2) / this.scene.scaleFactor, (y - this.displayHeight / 2) / this.scene.scaleFactor));
-              points.push({
+              vertices.push(new Planck.Vec2((x - this.displayWidth / 2), (y - this.displayHeight / 2)));
+              this.points.push({
                 x: x - this.displayWidth / 2,
                 y: y - this.displayHeight / 2,
               })
             }
           }
-          const fixture = this.body.createFixture(Planck.Polygon(vertices, points.length), { ...fixtureOptions, userData: data.fixtures[i].label });
+          const fixture = this.body.createFixture(Planck.Polygon(vertices, this.points.length), { ...fixtureOptions, isSensor: data.fixtures[i].isSensor, userData: data.fixtures[i].label });
           // this.body.setPosition(Planck.Vec2(this.x / this.scene.scaleFactor, this.y / this.scene.scaleFactor));
           // this.body.setPosition(Planck.Vec2(this.x / this.scene.scaleFactor, this.y / this.scene.scaleFactor));
           this.fixtures.push(fixture);
@@ -197,6 +201,7 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
   drawDebug() {
     this.graphics.clear();
     this.graphics.lineStyle(2, 0x0000ff, 1);
+
     switch (this.type) {
       case 'box':
         this.graphics.translateCanvas(this.x, this.y);
@@ -213,6 +218,11 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
         this.graphics.rotateCanvas(this.rotation);
         this.graphics.strokePoints(this.points, true, true);
         break;
+        case 'multi':
+          this.graphics.translateCanvas(this.x, this.y);
+          this.graphics.rotateCanvas(this.rotation);
+          this.graphics.strokePoints(this.points, true, true);
+          break;
       case 'edge':
         this.graphics.strokeLineShape({
           x1: this.opts.x1,

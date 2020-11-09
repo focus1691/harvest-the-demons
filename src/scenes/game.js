@@ -185,8 +185,7 @@ class playGame extends Phaser.Scene {
       // const b = this.sprites.filter((s) => s.fixture === contact.getFixtureB())[0]
       const a = contact.getFixtureA();
       const b = contact.getFixtureB();
-      console.log(a.getUserData());
-      console.log(b.getUserData());
+      console.log(`a) ${a.getUserData()}, b) ${b.getUserData()}`);
       // a.emit('collision-start', b)
       // b.emit('collision-start', a)
     })
@@ -289,8 +288,6 @@ class playGame extends Phaser.Scene {
 
     // this.player = new Player(this, { world: this.matter.world, x: 400, y: 150, key: 'ghost_warrior', shape: shapes.main_body });
     this.player = new Player(this, 0, 0, 'ghost_warrior', shapes.main_body);
-    this.player.left.drawDebug();
-    this.player.right.drawDebug();
 
     // Phaser.Display.Align.In.Center(this.player, this.add.zone(400, 300, 800, 600));
 
@@ -383,6 +380,10 @@ class playGame extends Phaser.Scene {
         this.targetLine.y2 = this.input.activePointer.worldY;
 
         this.player.update(this.targetLine);
+
+        Object.values(this.enemies).forEach((enemy) => enemy.drawDebug());
+        this.player.left.drawDebug();
+        this.player.right.drawDebug();
       }
     }
 
@@ -510,6 +511,9 @@ class playGame extends Phaser.Scene {
       },
       delay,
       duration,
+      onUpdate: function () {
+        // this.enemies[key].setPosition();
+      }.bind(this),
       onComplete: function () {
         // this.killEnemy(key, false);
         this.lives -= 1;
