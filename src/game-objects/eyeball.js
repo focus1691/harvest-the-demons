@@ -33,6 +33,8 @@ export default class Enemy extends Sprite {
   constructor(config) {
     super(config.scene, config.x, config.y, config.key, config.label);
 
+    this.scene = config.scene;
+    this.label = config.label;
     this.isAlive = true;
     this.bigEye = config.bigEye;
 
@@ -56,6 +58,10 @@ export default class Enemy extends Sprite {
   }
 
   onBloodSplatterEnd() {
-    this.setActive(false);
+    this.body.setActive(false);
+    // this.setBody('box');
+    // this.body.setStatic();
+    // this.body.setAwake(false);
+    // delete this.scene.enemies[this.label];
   }
 }

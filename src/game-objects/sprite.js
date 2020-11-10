@@ -38,6 +38,7 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
     // this.type = type;
     // this.opts = opts || {};
     this.body = this.scene.world.createBody();
+    console.log(this, this.body);
     this.body.setDynamic();
     // this.body.setMassData({
     //   mass: 1,

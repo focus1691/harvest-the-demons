@@ -185,15 +185,13 @@ class playGame extends Phaser.Scene {
     this.world.on('begin-contact', (contact, oldManifold) => {
       // const a = this.sprites.filter((s) => s.fixture === contact.getFixtureA())[0]
       // const b = this.sprites.filter((s) => s.fixture === contact.getFixtureB())[0]
-      const a = contact.getFixtureA();
-      const b = contact.getFixtureB();
-      const A = a.getUserData();
-      const B = b.getUserData();
-      console.log(`a) ${a.getUserData()}, b) ${b.getUserData()}`);
+      const a = contact.getFixtureA().getUserData();
+      const b = contact.getFixtureB().getUserData();
+      console.log(`a) ${a}, b) ${b}`);
 
       // Collision between the axe and enemy
-      if ( (A === 'axe' || B === 'axe') && (this.enemies[A] || this.enemies[B])) {
-        const enemyKey = B === 'axe' ? A : B;
+      if ( (a === 'axe' || b === 'axe') && (this.enemies[a] || this.enemies[b])) {
+        const enemyKey = b === 'axe' ? a : b;
 
         // Conditions for the axe to kill the small eye
         if (this.enemies[enemyKey].isAlive && !this.enemies[enemyKey].bigEye && !this.player.isAttacking()) {
@@ -204,6 +202,9 @@ class playGame extends Phaser.Scene {
         }
       }
 
+      if (this.remainingTargets === 0) {
+        this.roundOver();
+      }
 
       // if (bodyA.label === 'axe' && !this.afk && this.enemies[bodyB.label].isAlive && !this.enemies[bodyB.label].bigEye && !this.player.isAttacking()) {
         //     this.killEnemy(bodyB.label, true);
@@ -279,6 +280,7 @@ class playGame extends Phaser.Scene {
     this.events.on(
       'wake',
       function () {
+        this.initEnemies();
         this.time.addEvent({ startAt: 1000, delay: 6000, callback: this.animateEyes, callbackScope: this });
       },
       this
@@ -429,7 +431,6 @@ class playGame extends Phaser.Scene {
       this.scene.sleep('playGame');
       this.level += 1;
       this.removeEnemies();
-      this.initEnemies();
       this.healthBar.restore();
       this.energyBar.restore();
       this.sound.stopByKey('disturbing_piano_string');
@@ -449,7 +450,9 @@ class playGame extends Phaser.Scene {
       if (playerKill) {
         this.enemies[label].play('blood_splatter');
         // this.enemies[label].setToSleep();
-        this.enemies[label].body.setAwake(false);
+        // this.enemies[label].body.setActive(false);
+        // this.enemies[label].body.setAwake(false);
+        console.log(this.enemies[label].body.isActive(), this.enemies[label].body.isAwake())
         this.enemies[label].isAlive = false;
       } else {
         this.world.destroyBody(this.enemies[label].body);
@@ -468,6 +471,7 @@ class playGame extends Phaser.Scene {
       if (this.enemies[[keys[i]]].tween) {
         this.enemies[[keys[i]]].tween.remove();
       }
+      this.world.destroyBody(this.enemies[keys[i]].body);
       this.enemies[keys[i]].destroy();
       delete this.enemies[keys[i]];
     }
