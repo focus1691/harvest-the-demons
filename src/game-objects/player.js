@@ -24,7 +24,6 @@ export default class Player {
     this.left.body.label = 'player';
     this.right.body.label = 'player';
 
-    //TODO replace scale
     this.left.setScale(0.5 * assetsDPR, 0.5 * assetsDPR);
     this.right.setScale(0.5 * assetsDPR, 0.5 * assetsDPR);
 
@@ -43,7 +42,7 @@ export default class Player {
     if (!this.isAttacking() && !this.fatigued) {
       this.left.play('attack');
       this.right.play('attack');
-      this.scene.energyBar.deplete(20);
+      // this.scene.energyBar.deplete(20);
       this.lastAttack = new Date();
       this.fatigued = this.scene.energyBar.energy === 0;
     }
@@ -166,11 +165,13 @@ export default class Player {
 
   isAttacking() {
     const { key } = this.left.anims.currentAnim;
+    console.log(key);
 
     return key === 'attack' || key === 'hit';
   }
 
   isMelee() {
-    return Boolean(this.left.anims.currentFrame.textureFrame.match(/attack[6-9]|attack1[01]/gi));
+    // console.log(this.left.anims.currentFrame.textureFrame, Boolean(this.left.anims.currentFrame.textureFrame.match(/attack[1-9]|attack1[01]/gi)));
+    return Boolean(this.left.anims.currentFrame.textureFrame.match(/attack[1-9]|attack1[01]/gi));
   }
 }

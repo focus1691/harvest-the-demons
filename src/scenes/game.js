@@ -70,20 +70,20 @@ class playGame extends Phaser.Scene {
     this.lives = 5;
     this.best = localStorage.getItem('best_score') ? parseInt(localStorage.getItem('best_score'), 10) : 0;
     this.levels = [
-      {
-        targets: 5,
-        bigTargets: 0,
-        minDelay: 1000,
-        maxDelay: 2000,
-        duration: 4000,
-      },
-      {
-        targets: 20,
-        bigTargets: 3,
-        minDelay: 1000,
-        maxDelay: 2000,
-        duration: 4000,
-      },
+      // {
+      //   targets: 5,
+      //   bigTargets: 0,
+      //   minDelay: 1000,
+      //   maxDelay: 2000,
+      //   duration: 4000,
+      // },
+      // {
+      //   targets: 20,
+      //   bigTargets: 3,
+      //   minDelay: 1000,
+      //   maxDelay: 2000,
+      //   duration: 4000,
+      // },
       {
         targets: 0,
         bigTargets: 10,
@@ -186,7 +186,7 @@ class playGame extends Phaser.Scene {
     this.world.on('begin-contact', (contact, oldManifold) => {
       const a = contact.getFixtureA().getUserData();
       const b = contact.getFixtureB().getUserData();
-      console.log(`a) ${a}, b) ${b}`);
+      // console.log(`a) ${a}, b) ${b}`);
 
       // Collision between the axe and enemy
       if ((a === 'axe' || b === 'axe') && (this.enemies[a] || this.enemies[b])) {
@@ -198,6 +198,28 @@ class playGame extends Phaser.Scene {
           this.score++;
           this.scoreText.setText(`${this.score}`);
           this.sound.play('eye_kill');
+        }
+      }
+
+      else if ((a === 'body' || b === 'body') && (this.enemies[a] || this.enemies[b])) {
+        const enemyKey = b === 'body' ? a : b;
+        if (this.enemies[enemyKey].isAlive) {
+          let damageDealt = this.enemies[enemyKey].bigEye ? 90 : 35;
+          this.healthBar.damage(damageDealt);
+          this.killEnemy(enemyKey, false);
+          this.player.hit();
+          this.checkGameOver();
+        }
+      }
+
+      if (this.player.isMelee() && (a === 'melee' || b === 'melee') && (this.enemies[a] || this.enemies[b])) {
+        const enemyKey = b === 'melee' ? a : b;
+        if (this.enemies[enemyKey].isAlive && this.enemies[enemyKey].bigEye) {
+          let deathSound = this.enemies[enemyKey].bigEye ? 'big_eye_kill' : 'eye_kill';
+          this.sound.play(deathSound);
+          this.killEnemy(enemyKey, true);
+          this.score++;
+          this.scoreText.setText(`${this.score}`);
         }
       }
 
@@ -518,7 +540,6 @@ class playGame extends Phaser.Scene {
         // this.cameras.main.shake(200);
       }.bind(this),
     });
-    console.log(this.enemies[key].body);
     return delay;
   }
 
@@ -539,44 +560,6 @@ class playGame extends Phaser.Scene {
       return { x: W, y: Between(0, H) };
     }
     return { x: Between(0, W / 2 - 75 * assetsDPR * 2), y: 0 };
-  }
-
-  handleCollision(bodyA, bodyB) {
-    //   if ((bodyA.label === 'skull' && bodyB.label.length <= 5) || (playerShapeKeys.includes(bodyA.label) && playerShapeKeys.includes(bodyB.label))) return;
-    //   //* Any eye collides with the skull
-    //   if (bodyA.label === 'skull' && bodyB.label.length > 5 && this.enemies[bodyB.label].isAlive) {
-    //     this.killEnemy(bodyB.label, false);
-    //     this.lives -= 1;
-    //     this.sound.play('skull_damaged');
-    //     if (this.remainingTargets > 0) {
-    //       this.cameras.main.shake(200);
-    //       return;
-    //     }
-    //   }
-    //   //* Small eye collides with the player axe
-    //   else if (bodyA.label === 'axe' && !this.afk && this.enemies[bodyB.label].isAlive && !this.enemies[bodyB.label].bigEye && !this.player.isAttacking()) {
-    //     this.killEnemy(bodyB.label, true);
-    //     this.score++;
-    //     this.scoreText.setText(`${this.score}`);
-    //     this.sound.play('eye_kill');
-    //   }
-    //   //* Either eye collides with the player body
-    //   else if (bodyA.label === 'body' && this.enemies[bodyB.label].isAlive) {
-    //     this.healthBar.damage(this.enemies[bodyB.label].bigEye ? 90 : 35);
-    //     this.killEnemy(bodyB.label, false);
-    //     this.player.hit();
-    //     this.checkGameOver();
-    //   }
-    //   //* Eye eye collides with the melee
-    //   else if (this.player.isMelee() && this.enemies[bodyB.label].isAlive && (bodyA.label === 'axe' || bodyA.label === 'melee')) {
-    //     this.sound.play(this.enemies[bodyB.label].bigEye ? 'big_eye_kill' : 'eye_kill');
-    //     this.killEnemy(bodyB.label, true);
-    //     this.score++;
-    //     this.scoreText.setText(`${this.score}`);
-    //   }
-    //   if (this.remainingTargets === 0) {
-    //     this.roundOver();
-    //   }
   }
 
   createAnimation(key, name, prefix, start, end, suffix, yoyo, repeat, frameRate) {

@@ -34,7 +34,6 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
 
   setBody(data) {
     this.body = this.scene.world.createBody();
-    console.log(this, this.body);
     this.body.setDynamic();
     this.body.setMassData({
       mass: 0,
@@ -80,7 +79,7 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
               let vecY = (0.5 * assetsDPR * (y - this.displayHeight / 2)) / this.scene.scaleFactor;
 
               vertices.push(new Planck.Vec2(vecX, vecY));
-              this.points.push({
+              data.fixtures[i].label === 'melee' && this.points.push({
                 x: vecX * this.scene.scaleFactor,
                 y: 0.5 * assetsDPR * (y - this.displayHeight / 2),
               });
@@ -159,7 +158,7 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
       for (var i = 0; i < this.circles.length; i++) {
         this.graphics.translateCanvas(this.x, this.y);
         this.graphics.rotateCanvas(this.rotation);
-        this.graphics.strokeCircle(0, 0, this.circles[i].radius / 2);
+        this.graphics.strokeCircle(this.circles[i].x, this.circles[i].y, this.circles[i].radius / 2);
       }
     }
   }
