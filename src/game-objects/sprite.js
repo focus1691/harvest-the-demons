@@ -6,7 +6,6 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
   constructor(scene, x, y, texture, name) {
     super(scene, x, y);
     this.scene = scene;
-    // this.debug = scene.game.config.physics.planck.debug;
     this.type = null;
     this.name = name || '';
 
@@ -33,28 +32,15 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
     return this;
   }
 
-  // setBody(type, opts) {
   setBody(data) {
-    // this.type = type;
-    // this.opts = opts || {};
     this.body = this.scene.world.createBody();
     console.log(this, this.body);
     this.body.setDynamic();
-    // this.body.setMassData({
-    //   mass: 1,
-    //   center: Planck.Vec2(),
-    //   I: 1,
-    // });
     this.body.setMassData({
       mass: 0,
       center: Planck.Vec2(),
       I: 1,
     });
-    // const fixtureOptions = {
-    //   friction: this.opts.friction || 1.0,
-    //   restitution: this.opts.restitution || 0.0,
-    //   density: this.opts.density || 1.0,
-    // };
 
     this.points = [];
     this.circles = [];
@@ -68,10 +54,7 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
     if (typeof data === 'string') {
       if (data === 'box') {
         this.type = 'box';
-        const fixture = this.body.createFixture(Planck.Box(this.displayWidth / 2 / this.scene.scaleFactor, this.displayHeight / 2 / this.scene.scaleFactor), { ...fixtureOptions, isSensor: true, userData: this.name });
-        // this.body.setPosition(Planck.Vec2((this.x + this.displayWidth / 2) / this.scene.scaleFactor, (this.y - this.displayHeight / 2) / this.scene.scaleFactor));
-        // this.body.setPosition(Planck.Vec2((this.x + this.displayWidth / 2) / this.scene.scaleFactor, (this.y - this.displayHeight / 2) / this.scene.scaleFactor));
-        // this.fixtures.push(fixture);
+        this.body.createFixture(Planck.Box(this.displayWidth / 2 / this.scene.scaleFactor, this.displayHeight / 2 / this.scene.scaleFactor), { ...fixtureOptions, isSensor: true, userData: this.name });
       }
     } else {
       this.type = 'multi';
@@ -81,87 +64,33 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
           let circleX = data.fixtures[i].circle.x / this.scene.scaleFactor;
           let circleY = data.fixtures[i].circle.y / this.scene.scaleFactor;
 
-          let fixture = this.body.createFixture(Planck.Circle(circleR), { ...fixtureOptions, isSensor: data.fixtures[i].isSensor, userData: data.fixtures[i].label });
-          // this.body.setPosition(Planck.Vec2(data.fixtures[i].circle.x / this.scene.scaleFactor, data.fixtures[i].circle.y / this.scene.scaleFactor));
-          // this.body.setPosition(Planck.Vec2(circleX, circleY));
-          // this.fixtures.push(fixture);
+          this.body.createFixture(Planck.Circle(circleR), { ...fixtureOptions, isSensor: data.fixtures[i].isSensor, userData: data.fixtures[i].label });
           this.circles.push({
-            // x: circleX * this.scene.scaleFactor,
-            // y: circleY * this.scene.scaleFactor,
-            x: (this.flipX ? -1 : 1) * ((0.5 * assetsDPR) * (circleX - this.displayWidth / 2)) / this.scene.scaleFactor,
-            y: (this.flipX ? -1 : 1) * ((0.5 * assetsDPR) * (circleY - this.displayHeight / 2)) / this.scene.scaleFactor,
+            x: ((this.flipX ? -1 : 1) * (0.5 * assetsDPR * (circleX - this.displayWidth / 2))) / this.scene.scaleFactor,
+            y: ((this.flipX ? -1 : 1) * (0.5 * assetsDPR * (circleY - this.displayHeight / 2))) / this.scene.scaleFactor,
             radius: circleR,
-          })
-        }
-        else if (data.fixtures[i].vertices) {
+          });
+        } else if (data.fixtures[i].vertices) {
           let vertices = [];
           let points = [];
           for (var j = 0; j < data.fixtures[i].vertices.length; j++) {
             for (var k = 0; k < data.fixtures[i].vertices[j].length; k++) {
-              // vertices.push(new Planck.Vec2((p[0] - this.displayWidth / 2) / this.scene.scaleFactor, (p[1] - this.displayHeight / 2) / this.scene.scaleFactor));
-              // this.points.push({
-              //   x: p[0] - this.displayWidth / 2,
-              //   y: p[1] - this.displayHeight / 2,
-              // });
-  
               let { x, y } = data.fixtures[i].vertices[j][k];
-              let vecX = (this.flipX ? -1 : 1) * ((0.5 * assetsDPR) * (x - this.displayWidth / 2)) / this.scene.scaleFactor;
-              let vecY = ((0.5 * assetsDPR) * (y - this.displayHeight / 2)) / this.scene.scaleFactor;
-  
+              let vecX = ((this.flipX ? -1 : 1) * (0.5 * assetsDPR * (x - this.displayWidth / 2))) / this.scene.scaleFactor;
+              let vecY = (0.5 * assetsDPR * (y - this.displayHeight / 2)) / this.scene.scaleFactor;
+
               vertices.push(new Planck.Vec2(vecX, vecY));
               this.points.push({
                 x: vecX * this.scene.scaleFactor,
-                y: (0.5 * assetsDPR) * (y - this.displayHeight / 2),
-              })
+                y: 0.5 * assetsDPR * (y - this.displayHeight / 2),
+              });
             }
           }
           const fixture = this.body.createFixture(Planck.Polygon(vertices, this.points.length), { ...fixtureOptions, isSensor: data.fixtures[i].isSensor, userData: data.fixtures[i].label });
-          // this.body.setPosition(Planck.Vec2(this.x / this.scene.scaleFactor, this.y / this.scene.scaleFactor));
-          // this.body.setPosition(Planck.Vec2(this.x / this.scene.scaleFactor, this.y / this.scene.scaleFactor));
           this.fixtures.push(fixture);
         }
       }
     }
-
-    // switch (type) {
-    //   case 'box':
-    //     this.fixture = this.body.createFixture(Planck.Box(this.displayWidth / 2 / this.scene.scaleFactor, this.displayHeight / 2 / this.scene.scaleFactor), fixtureOptions);
-    //     this.body.setPosition(Planck.Vec2((this.x + this.displayWidth / 2) / this.scene.scaleFactor, (this.y - this.displayHeight / 2) / this.scene.scaleFactor));
-    //     break;
-    //   case 'circle':
-    //     this.fixture = this.body.createFixture(Planck.Circle(this.displayWidth / 2 / this.scene.scaleFactor), fixtureOptions);
-    //     this.body.setPosition(Planck.Vec2(this.x / this.scene.scaleFactor, this.y / this.scene.scaleFactor));
-    //     break;
-    //   case 'polygon':
-    //     this.vertices = [];
-    //     this.points = [];
-    //     this.opts.points.forEach((p) => {
-    //       this.vertices.push(new Planck.Vec2((p[0] - this.displayWidth / 2) / this.scene.scaleFactor, (p[1] - this.displayHeight / 2) / this.scene.scaleFactor));
-    //       this.points.push({
-    //         x: p[0] - this.displayWidth / 2,
-    //         y: p[1] - this.displayHeight / 2,
-    //       });
-    //     });
-    //     this.fixture = this.body.createFixture(Planck.Polygon(this.vertices, this.opts.points.length), fixtureOptions);
-    //     this.body.setPosition(Planck.Vec2(this.x / this.scene.scaleFactor, this.y / this.scene.scaleFactor));
-    //     break;
-    //   case 'edge':
-    //     this.fixture = this.body.createFixture(
-    //       Planck.Edge(Planck.Vec2(this.opts.x1 / this.scene.scaleFactor, this.opts.y1 / this.scene.scaleFactor), Planck.Vec2(this.opts.x2 / this.scene.scaleFactor, this.opts.y2 / this.scene.scaleFactor)),
-    //       {
-    //         friction: 1,
-    //         restitution: 0.5,
-    //         density: 1,
-    //       }
-    //     );
-    //     this.body.setStatic();
-    //     break;
-    //   default:
-    //     break;
-    // }
-
-    
-
     return this;
   }
 
@@ -218,65 +147,27 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
     this.graphics.clear();
     this.graphics.lineStyle(2, 0x0000ff, 1);
 
-    switch (this.type) {
-      case 'box':
-        this.graphics.translateCanvas(this.x, this.y);
-        this.graphics.rotateCanvas(this.rotation);
-        this.graphics.strokeRect(-this.displayWidth / 2, -this.displayHeight / 2, this.displayWidth, this.displayHeight);
-        break;
-      case 'circle':
-        this.graphics.translateCanvas(this.x, this.y);
-        this.graphics.rotateCanvas(this.rotation);
-        this.graphics.strokeCircle(0, 0, this.displayWidth / 2);
-        break;
-      case 'polygon':
-        this.graphics.translateCanvas(this.x, this.y);
-        this.graphics.rotateCanvas(this.rotation);
-        this.graphics.strokePoints(this.points, true, true);
-        break;
-        case 'multi':
-          this.graphics.translateCanvas(this.x, this.y);
-          this.graphics.rotateCanvas(this.rotation);
-          this.graphics.strokePoints(this.points, true, true);
+    if (this.type === 'box') {
+      this.graphics.translateCanvas(this.x, this.y);
+      this.graphics.rotateCanvas(this.rotation);
+      this.graphics.strokeRect(-this.displayWidth / 2, -this.displayHeight / 2, this.displayWidth, this.displayHeight);
+    } else if (this.type === 'multi') {
+      this.graphics.translateCanvas(this.x, this.y);
+      this.graphics.rotateCanvas(this.rotation);
+      this.graphics.strokePoints(this.points, true, true);
 
-          for (var i = 0; i < this.circles.length; i++) {
-            this.graphics.translateCanvas(this.x, this.y);
-            this.graphics.rotateCanvas(this.rotation);
-            this.graphics.strokeCircle(0, 0, this.circles[i].radius / 2);
-          }
-          break;
-      case 'edge':
-        this.graphics.strokeLineShape({
-          x1: this.opts.x1,
-          y1: this.opts.y1,
-          x2: this.opts.x2,
-          y2: this.opts.y2,
-        });
-        break;
-      default:
-        break;
+      for (var i = 0; i < this.circles.length; i++) {
+        this.graphics.translateCanvas(this.x, this.y);
+        this.graphics.rotateCanvas(this.rotation);
+        this.graphics.strokeCircle(0, 0, this.circles[i].radius / 2);
+      }
     }
   }
 
   /**
    * PreSolve Planck World
    */
-  preSolve(contact, oldManifold) {
-    const a = contact.getFixtureA();
-    const b = contact.getFixtureB();
-    console.log(`presolve: a) ${a.getUserData()}, b) ${b.getUserData()}`);
-    // Conveyer
-    // if (this.conveyer) {
-    //   let fixtureA = contact.getFixtureA();
-    //   let fixtureB = contact.getFixtureB();
-    //   if (fixtureA === this.fixture) {
-    //     contact.setTangentSpeed(-this.conveyerSpeed);
-    //   }
-    //   if (fixtureB === this.fixture) {
-    //     contact.setTangentSpeed(this.conveyerSpeed);
-    //   }
-    // }
-  }
+  preSolve(contact, oldManifold) {}
 
   /**
    * PostSolve Planck World
@@ -295,11 +186,6 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
     this.scene.world.destroyBody(this.body);
     this.graphics.destroy();
     this.body.destroy = () => {};
-    // this.scene.sprites.forEach((s, i) => {
-    //   if (s === this) {
-    //     this.scene.sprites.splice(i, 1);
-    //   }
-    // });
   }
 
   preUpdate(time, delta) {
