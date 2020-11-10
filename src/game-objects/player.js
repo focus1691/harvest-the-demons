@@ -17,6 +17,7 @@ export default class Player {
     // this.right = scene.matter.add.sprite(config.x, config.y, config.key, null, { shape: config.shape });
     this.left = new Sprite(scene, x, y, key);
     this.right = new Sprite(scene, x, y, key);
+    this.right.flipX = true;
     // this.left.setOrigin(1, 0.5);
     // this.right.setOrigin(0.5, 0.5);
 
@@ -29,7 +30,6 @@ export default class Player {
 
     this.left.body.label = 'player';
     this.right.body.label = 'player';
-    console.log(this.left.body);
 
     // this.left.body.ignoreGravity = true;
     // this.right.body.ignoreGravity = true;
@@ -44,8 +44,6 @@ export default class Player {
     //	Just the one listener:
     this.left.on('animationupdate-attack', this.onMeleeAnimation, this);
     this.left.on('animationcomplete', this.animComplete, this);
-
-    this.right.flipX = true;
 
     //TODO replace scale
     // this.scene.matter.body.scale(this.right.body, -1, 1);

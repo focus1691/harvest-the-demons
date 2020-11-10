@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import * as Planck from 'planck-js';
+import { assetsDPR } from '../index';
 
 export default class Sprite extends Phaser.GameObjects.Sprite {
   constructor(scene, x, y, texture, name) {
@@ -91,11 +92,13 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
               // });
   
               let { x, y } = data.fixtures[i].vertices[j][k];
+              let vecX = (this.flipX ? -1 : 1) * ((0.5 * assetsDPR) * (x - this.displayWidth / 2)) / this.scene.scaleFactor;
+              let vecY = ((0.5 * assetsDPR) * (y - this.displayHeight / 2)) / this.scene.scaleFactor;
   
-              vertices.push(new Planck.Vec2((x - this.displayWidth / 2), (y - this.displayHeight / 2)));
+              vertices.push(new Planck.Vec2(vecX, vecY));
               this.points.push({
-                x: x - this.displayWidth / 2,
-                y: y - this.displayHeight / 2,
+                x: vecX * this.scene.scaleFactor,
+                y: (0.5 * assetsDPR) * (y - this.displayHeight / 2),
               })
             }
           }
