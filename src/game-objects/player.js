@@ -92,11 +92,6 @@ export default class Player {
     var lineAngle = Phaser.Geom.Line.Angle(targetLine);
     var angleDeg = Phaser.Math.RadToDeg(lineAngle);
 
-    // console.log({
-    //   lineAngle,
-    //   angleDeg,
-    // })
-
     //? Keep this
     this.left.setPosition(targetLine.x1, targetLine.y1);
     this.right.setPosition(targetLine.x1, targetLine.y1);

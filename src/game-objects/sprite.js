@@ -56,6 +56,7 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
     // };
 
     this.points = [];
+    this.circles = [];
 
     const fixtureOptions = {
       friction: data.friction || 0.0,
@@ -69,16 +70,27 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
         const fixture = this.body.createFixture(Planck.Box(this.displayWidth / 2 / this.scene.scaleFactor, this.displayHeight / 2 / this.scene.scaleFactor), { ...fixtureOptions, isSensor: true, userData: this.name });
         // this.body.setPosition(Planck.Vec2((this.x + this.displayWidth / 2) / this.scene.scaleFactor, (this.y - this.displayHeight / 2) / this.scene.scaleFactor));
         // this.body.setPosition(Planck.Vec2((this.x + this.displayWidth / 2) / this.scene.scaleFactor, (this.y - this.displayHeight / 2) / this.scene.scaleFactor));
-        this.fixtures.push(fixture);
+        // this.fixtures.push(fixture);
       }
     } else {
       this.type = 'multi';
       for (var i = 0; i < data.fixtures.length; i++) {
         if (data.fixtures[i].circle) {
-          let fixture = this.body.createFixture(Planck.Circle(data.fixtures[i].circle.radius / 2 / this.scene.scaleFactor), { ...fixtureOptions, isSensor: data.fixtures[i].isSensor, userData: data.fixtures[i].label });
+          let circleR = data.fixtures[i].circle.radius / 2 / this.scene.scaleFactor;
+          let circleX = data.fixtures[i].circle.x / this.scene.scaleFactor;
+          let circleY = data.fixtures[i].circle.y / this.scene.scaleFactor;
+
+          let fixture = this.body.createFixture(Planck.Circle(circleR), { ...fixtureOptions, isSensor: data.fixtures[i].isSensor, userData: data.fixtures[i].label });
           // this.body.setPosition(Planck.Vec2(data.fixtures[i].circle.x / this.scene.scaleFactor, data.fixtures[i].circle.y / this.scene.scaleFactor));
-          // this.body.setPosition(Planck.Vec2(this.x / this.scene.scaleFactor, this.y / this.scene.scaleFactor));
-          this.fixtures.push(fixture);
+          // this.body.setPosition(Planck.Vec2(circleX, circleY));
+          // this.fixtures.push(fixture);
+          this.circles.push({
+            // x: circleX * this.scene.scaleFactor,
+            // y: circleY * this.scene.scaleFactor,
+            x: (this.flipX ? -1 : 1) * ((0.5 * assetsDPR) * (circleX - this.displayWidth / 2)) / this.scene.scaleFactor,
+            y: (this.flipX ? -1 : 1) * ((0.5 * assetsDPR) * (circleY - this.displayHeight / 2)) / this.scene.scaleFactor,
+            radius: circleR,
+          })
         }
         else if (data.fixtures[i].vertices) {
           let vertices = [];
@@ -225,6 +237,12 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
           this.graphics.translateCanvas(this.x, this.y);
           this.graphics.rotateCanvas(this.rotation);
           this.graphics.strokePoints(this.points, true, true);
+
+          for (var i = 0; i < this.circles.length; i++) {
+            this.graphics.translateCanvas(this.x, this.y);
+            this.graphics.rotateCanvas(this.rotation);
+            this.graphics.strokeCircle(0, 0, this.circles[i].radius / 2);
+          }
           break;
       case 'edge':
         this.graphics.strokeLineShape({
@@ -243,23 +261,30 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
    * PreSolve Planck World
    */
   preSolve(contact, oldManifold) {
+    const a = contact.getFixtureA();
+    const b = contact.getFixtureB();
+    console.log(`presolve: a) ${a.getUserData()}, b) ${b.getUserData()}`);
     // Conveyer
-    if (this.conveyer) {
-      let fixtureA = contact.getFixtureA();
-      let fixtureB = contact.getFixtureB();
-      if (fixtureA === this.fixture) {
-        contact.setTangentSpeed(-this.conveyerSpeed);
-      }
-      if (fixtureB === this.fixture) {
-        contact.setTangentSpeed(this.conveyerSpeed);
-      }
-    }
+    // if (this.conveyer) {
+    //   let fixtureA = contact.getFixtureA();
+    //   let fixtureB = contact.getFixtureB();
+    //   if (fixtureA === this.fixture) {
+    //     contact.setTangentSpeed(-this.conveyerSpeed);
+    //   }
+    //   if (fixtureB === this.fixture) {
+    //     contact.setTangentSpeed(this.conveyerSpeed);
+    //   }
+    // }
   }
 
   /**
    * PostSolve Planck World
    */
-  postSolve(contact, oldManifold) {}
+  postSolve(contact, oldManifold) {
+    const a = contact.getFixtureA();
+    const b = contact.getFixtureB();
+    console.log(`postSolve: a) ${a.getUserData()}, b) ${b.getUserData()}`);
+  }
 
   /**
    * PreDestroy / PreUpdate Methods

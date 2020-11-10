@@ -176,16 +176,42 @@ class playGame extends Phaser.Scene {
     // Planck event bindings
     this.world.on('pre-solve', (contact, oldManifold) => {
       // this.sprites.forEach((s) => s.preSolve(contact, oldManifold))
+      // Object.values(this.enemies).forEach((enemy) => enemy.preSolve(contact, oldManifold));
     })
     this.world.on('post-solve', (contact, oldManifold) => {
       // this.sprites.forEach((s) => s.postSolve(contact, oldManifold))
+      // Object.values(this.enemies).forEach((enemy) => enemy.preSolve(contact, oldManifold));
     })
     this.world.on('begin-contact', (contact, oldManifold) => {
       // const a = this.sprites.filter((s) => s.fixture === contact.getFixtureA())[0]
       // const b = this.sprites.filter((s) => s.fixture === contact.getFixtureB())[0]
       const a = contact.getFixtureA();
       const b = contact.getFixtureB();
+      const A = a.getUserData();
+      const B = b.getUserData();
       console.log(`a) ${a.getUserData()}, b) ${b.getUserData()}`);
+
+      // Collision between the axe and enemy
+      if ( (A === 'axe' || B === 'axe') && (this.enemies[A] || this.enemies[B])) {
+        const enemyKey = B === 'axe' ? A : B;
+
+        // Conditions for the axe to kill the small eye
+        if (this.enemies[enemyKey].isAlive && !this.enemies[enemyKey].bigEye && !this.player.isAttacking()) {
+          this.killEnemy(enemyKey, true);
+          this.score++;
+          this.scoreText.setText(`${this.score}`);
+          this.sound.play('eye_kill');  
+        }
+      }
+
+
+      // if (bodyA.label === 'axe' && !this.afk && this.enemies[bodyB.label].isAlive && !this.enemies[bodyB.label].bigEye && !this.player.isAttacking()) {
+        //     this.killEnemy(bodyB.label, true);
+        //     this.score++;
+        //     this.scoreText.setText(`${this.score}`);
+        //     this.sound.play('eye_kill');
+      // }
+
       // a.emit('collision-start', b)
       // b.emit('collision-start', a)
     })
@@ -422,14 +448,17 @@ class playGame extends Phaser.Scene {
 
       if (playerKill) {
         this.enemies[label].play('blood_splatter');
-        this.enemies[label].setToSleep();
+        // this.enemies[label].setToSleep();
+        this.enemies[label].body.setAwake(false);
         this.enemies[label].isAlive = false;
       } else {
+        this.world.destroyBody(this.enemies[label].body);
         this.enemies[label].destroy();
         delete this.enemies[label];
       }
       this.remainingTargets -= 1;
     }
+    console.log(this.world.getBodyCount());
   }
 
   removeEnemies() {
@@ -491,6 +520,8 @@ class playGame extends Phaser.Scene {
     this.enemies[key].body.setAngle(Math.atan2(y - this.skull.y, x - this.skull.x));
     delay += Between(min, max);
 
+    // this.enemies[key].setPosition(this.targetLine.x1 - 100, this.targetLine.y1);
+
     this.enemies[key].tween = this.tweens.add({
       targets: this.enemies[key],
       visible: {
@@ -511,16 +542,18 @@ class playGame extends Phaser.Scene {
       },
       delay,
       duration,
-      onUpdate: function () {
-        // this.enemies[key].setPosition();
+      onUpdate: function() {
+        this.enemies[key].setPosition(this.enemies[key].x, this.enemies[key].y);
+        // console.log('on update', this.enemies[key].getPosition(), this.enemies[key].x, this.enemies[key].y);
       }.bind(this),
       onComplete: function () {
-        // this.killEnemy(key, false);
+        this.killEnemy(key, false);
         this.lives -= 1;
         this.sound.play('skull_damaged');
         // this.cameras.main.shake(200);
       }.bind(this),
     });
+    console.log(this.enemies[key].body);
     return delay;
   }
 
@@ -543,7 +576,7 @@ class playGame extends Phaser.Scene {
     return { x: Between(0, W / 2 - 75 * assetsDPR * 2), y: 0 };
   }
 
-  // handleCollision(bodyA, bodyB) {
+  handleCollision(bodyA, bodyB) {
   //   if ((bodyA.label === 'skull' && bodyB.label.length <= 5) || (playerShapeKeys.includes(bodyA.label) && playerShapeKeys.includes(bodyB.label))) return;
   //   //* Any eye collides with the skull
   //   if (bodyA.label === 'skull' && bodyB.label.length > 5 && this.enemies[bodyB.label].isAlive) {
@@ -579,7 +612,7 @@ class playGame extends Phaser.Scene {
   //   if (this.remainingTargets === 0) {
   //     this.roundOver();
   //   }
-  // }
+  }
 
   createAnimation(key, name, prefix, start, end, suffix, yoyo, repeat, frameRate) {
     this.anims.create({
