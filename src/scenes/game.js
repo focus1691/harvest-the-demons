@@ -68,20 +68,20 @@ class playGame extends Phaser.Scene {
     this.lives = 5;
     this.best = localStorage.getItem('best_score') ? parseInt(localStorage.getItem('best_score'), 10) : 0;
     this.levels = [
-      {
-        targets: 5,
-        bigTargets: 0,
-        minDelay: 1000,
-        maxDelay: 2000,
-        duration: 4000,
-      },
-      {
-        targets: 20,
-        bigTargets: 3,
-        minDelay: 1000,
-        maxDelay: 2000,
-        duration: 4000,
-      },
+      // {
+      //   targets: 5,
+      //   bigTargets: 0,
+      //   minDelay: 1000,
+      //   maxDelay: 2000,
+      //   duration: 4000,
+      // },
+      // {
+      //   targets: 20,
+      //   bigTargets: 3,
+      //   minDelay: 1000,
+      //   maxDelay: 2000,
+      //   duration: 4000,
+      // },
       {
         targets: 0,
         bigTargets: 10,
@@ -214,13 +214,22 @@ class playGame extends Phaser.Scene {
       //     labelB: b,
       //     lastAttack: new Date().getTime() - this.player.lastAttack.getTime(),
       //   };
+      //   console.table(data);
       // }
 
       if ((a === 'melee' || b === 'melee') && (this.enemies[a] || this.enemies[b])) {
         const enemyKey = b === 'melee' ? a : b;
 
         if (this.enemies[enemyKey].isAlive) {
-          if (!this.contactList.includes(enemyKey)) {
+          let timeSinceLastAttack = new Date().getTime() - this.player.lastAttack.getTime();
+
+          if (this.player.axeSwinging || (timeSinceLastAttack < 400 && timeSinceLastAttack > 16)) {
+            // console.log('KILL *******************************************************************************************************************');
+            let isBigEye = this.enemies[enemyKey].bigEye;
+            this.killEnemy(enemyKey, false);
+            this.onEnemyKilled(isBigEye);
+          }
+          else if (!this.contactList.includes(enemyKey)) {
             this.contactList.push(enemyKey);
           }
         }
@@ -457,6 +466,7 @@ class playGame extends Phaser.Scene {
 
       if (!playerGotHit) {
         this.enemies[label].play('blood_splatter');
+        this.world.destroyBody(this.enemies[label].body);
       } else {
         this.removeEnemy(label);
       }

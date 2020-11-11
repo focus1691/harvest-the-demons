@@ -43,12 +43,11 @@ export default class Player {
   attack() {
     if (!this.isAttacking() && !this.fatigued) {
       this.lastAttack = new Date();
-      this.axeSwinging = true;
       this.left.play('attack');
       this.right.play('attack');
       this.scene.energyBar.deplete(15);
-      this.lastAttack = new Date();
       this.fatigued = this.scene.energyBar.energy === 0;
+      this.scene.sound.play('axe_swing');
     }
   }
 
@@ -178,6 +177,7 @@ export default class Player {
       this.scene.contactList = [];
       
       if (index === 8) {
+        this.axeSwinging = true;
         this.scene.sound.play('axe_swing');
       }
       if (index === 11) {
