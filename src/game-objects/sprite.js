@@ -174,7 +174,6 @@ export default class Sprite extends Phaser.GameObjects.Sprite {
   postSolve(contact, oldManifold) {
     const a = contact.getFixtureA();
     const b = contact.getFixtureB();
-    console.log(`postSolve: a) ${a.getUserData()}, b) ${b.getUserData()}`);
   }
 
   /**

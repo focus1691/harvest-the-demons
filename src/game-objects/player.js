@@ -36,21 +36,32 @@ export default class Player {
 
     this.midLine = new Phaser.Geom.Line();
     this.reflectedLine = new Phaser.Geom.Line();
+
+    this.axeSwinging = false;
   }
 
   attack() {
     if (!this.isAttacking() && !this.fatigued) {
+      this.lastAttack = new Date();
+      this.axeSwinging = true;
       this.left.play('attack');
       this.right.play('attack');
-      // this.scene.energyBar.deplete(20);
+      this.scene.energyBar.deplete(15);
       this.lastAttack = new Date();
       this.fatigued = this.scene.energyBar.energy === 0;
     }
   }
 
+  stop() {
+    this.left.anims.stop();
+    this.right.anims.stop();
+    this.axeSwinging = false;
+  }
+
   idle() {
     this.left.play('idle');
     this.right.play('idle');
+    this.axeSwinging = false;
   }
 
   hit() {
@@ -155,7 +166,24 @@ export default class Player {
   onMeleeAnimation(animation, animationFrame) {
     const { index } = animationFrame;
 
-    if (index === 8) this.scene.sound.play('axe_swing');
+    if (index > 8) {
+      for (let i = 0; i < this.scene.contactList.length; i++) {
+        let key = this.scene.contactList[i];
+        if (this.scene.enemies[key]) {
+          let isBigEye = this.scene.enemies[key].bigEye;
+          this.scene.killEnemy(key, false);
+          this.scene.onEnemyKilled(isBigEye);
+        }
+      }
+      this.scene.contactList = [];
+      
+      if (index === 8) {
+        this.scene.sound.play('axe_swing');
+      }
+      if (index === 11) {
+        this.axeSwinging = false;
+      }      
+    }
   }
 
   animComplete(animation, frame) {
@@ -165,13 +193,7 @@ export default class Player {
 
   isAttacking() {
     const { key } = this.left.anims.currentAnim;
-    console.log(key);
 
     return key === 'attack' || key === 'hit';
-  }
-
-  isMelee() {
-    // console.log(this.left.anims.currentFrame.textureFrame, Boolean(this.left.anims.currentFrame.textureFrame.match(/attack[1-9]|attack1[01]/gi)));
-    return Boolean(this.left.anims.currentFrame.textureFrame.match(/attack[1-9]|attack1[01]/gi));
   }
 }

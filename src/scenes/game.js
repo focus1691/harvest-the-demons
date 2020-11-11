@@ -51,8 +51,6 @@ import healthBarRightFrame from '../assets/images/healthbar/red/meter_bar_holder
 import healthMeterBadge from '../assets/images/healthbar/red/meter_icon_holder_red.png';
 import healthMeterIcon from '../assets/images/healthbar/icons/health.png';
 
-const playerShapeKeys = ['body', 'melee', 'axe'];
-
 class playGame extends Phaser.Scene {
   constructor() {
     super('playGame');
@@ -70,20 +68,20 @@ class playGame extends Phaser.Scene {
     this.lives = 5;
     this.best = localStorage.getItem('best_score') ? parseInt(localStorage.getItem('best_score'), 10) : 0;
     this.levels = [
-      // {
-      //   targets: 5,
-      //   bigTargets: 0,
-      //   minDelay: 1000,
-      //   maxDelay: 2000,
-      //   duration: 4000,
-      // },
-      // {
-      //   targets: 20,
-      //   bigTargets: 3,
-      //   minDelay: 1000,
-      //   maxDelay: 2000,
-      //   duration: 4000,
-      // },
+      {
+        targets: 5,
+        bigTargets: 0,
+        minDelay: 1000,
+        maxDelay: 2000,
+        duration: 4000,
+      },
+      {
+        targets: 20,
+        bigTargets: 3,
+        minDelay: 1000,
+        maxDelay: 2000,
+        duration: 4000,
+      },
       {
         targets: 0,
         bigTargets: 10,
@@ -122,6 +120,7 @@ class playGame extends Phaser.Scene {
     ];
     this.enemies = {};
     this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTargets;
+    this.contactList = [];
   }
 
   preload() {
@@ -186,7 +185,6 @@ class playGame extends Phaser.Scene {
     this.world.on('begin-contact', (contact, oldManifold) => {
       const a = contact.getFixtureA().getUserData();
       const b = contact.getFixtureB().getUserData();
-      // console.log(`a) ${a}, b) ${b}`);
 
       // Collision between the axe and enemy
       if ((a === 'axe' || b === 'axe') && (this.enemies[a] || this.enemies[b])) {
@@ -194,32 +192,37 @@ class playGame extends Phaser.Scene {
 
         // Conditions for the axe to kill the small eye
         if (this.enemies[enemyKey].isAlive && !this.enemies[enemyKey].bigEye && !this.player.isAttacking()) {
-          this.killEnemy(enemyKey, true);
-          this.score++;
-          this.scoreText.setText(`${this.score}`);
-          this.sound.play('eye_kill');
+          let isBigEye = this.enemies[enemyKey].bigEye;
+          this.killEnemy(enemyKey, false);
+          this.onEnemyKilled(isBigEye);
         }
       }
-
+      
       else if ((a === 'body' || b === 'body') && (this.enemies[a] || this.enemies[b])) {
         const enemyKey = b === 'body' ? a : b;
         if (this.enemies[enemyKey].isAlive) {
-          let damageDealt = this.enemies[enemyKey].bigEye ? 90 : 35;
-          this.healthBar.damage(damageDealt);
-          this.killEnemy(enemyKey, false);
-          this.player.hit();
-          this.checkGameOver();
+          let isBigEye = this.enemies[enemyKey].bigEye;
+          this.killEnemy(enemyKey, true);
+          this.onPlayerHit(isBigEye);
         }
       }
 
-      if (this.player.isMelee() && (a === 'melee' || b === 'melee') && (this.enemies[a] || this.enemies[b])) {
+      // if ((a === 'melee' || b === 'melee') && (this.enemies[a] || this.enemies[b])) {
+      //   const data = {
+      //     axeSwinging: this.player.axeSwinging,
+      //     labelA: a,
+      //     labelB: b,
+      //     lastAttack: new Date().getTime() - this.player.lastAttack.getTime(),
+      //   };
+      // }
+
+      if ((a === 'melee' || b === 'melee') && (this.enemies[a] || this.enemies[b])) {
         const enemyKey = b === 'melee' ? a : b;
-        if (this.enemies[enemyKey].isAlive && this.enemies[enemyKey].bigEye) {
-          let deathSound = this.enemies[enemyKey].bigEye ? 'big_eye_kill' : 'eye_kill';
-          this.sound.play(deathSound);
-          this.killEnemy(enemyKey, true);
-          this.score++;
-          this.scoreText.setText(`${this.score}`);
+
+        if (this.enemies[enemyKey].isAlive) {
+          if (!this.contactList.includes(enemyKey)) {
+            this.contactList.push(enemyKey);
+          }
         }
       }
 
@@ -359,6 +362,7 @@ class playGame extends Phaser.Scene {
       'pointerdown',
       function (pointer) {
         if (pointer.leftButtonDown()) {
+          this.player.stop();
           this.player.attack();
         }
       },
@@ -399,9 +403,8 @@ class playGame extends Phaser.Scene {
 
         this.player.update(this.targetLine);
 
-        Object.values(this.enemies).forEach((enemy) => enemy.drawDebug());
-        this.player.left.drawDebug();
-        this.player.right.drawDebug();
+        // this.player.left.drawDebug();
+        // this.player.right.drawDebug();
       }
     }
 
@@ -431,36 +434,51 @@ class playGame extends Phaser.Scene {
     }
   }
 
-  killEnemy(label, playerKill) {
+  onPlayerHit(bigEye) {
+    let damageDealt = bigEye ? 90 : 35;
+    this.healthBar.damage(damageDealt);
+    this.player.hit();
+    this.checkGameOver();
+  }
+
+  onEnemyKilled(bigEye) {
+    let deathSound = bigEye ? 'big_eye_kill' : 'eye_kill';
+    this.sound.play(deathSound);
+    this.score++;
+    this.scoreText.setText(`${this.score}`);
+  }
+
+  killEnemy(label, playerGotHit) {
     if (this.enemies[label]) {
+      this.enemies[label].isAlive = false;
       if (this.enemies[label].tween) {
         this.enemies[label].tween.remove();
       }
 
-      if (playerKill) {
+      if (!playerGotHit) {
         this.enemies[label].play('blood_splatter');
-        console.log(this.enemies[label].body.isActive(), this.enemies[label].body.isAwake());
-        this.enemies[label].isAlive = false;
       } else {
-        this.world.destroyBody(this.enemies[label].body);
-        this.enemies[label].destroy();
-        delete this.enemies[label];
+        this.removeEnemy(label);
       }
       this.remainingTargets -= 1;
     }
-    console.log(this.world.getBodyCount());
+  }
+
+  removeEnemy(key) {
+    if (this.enemies[key].tween) {
+      this.enemies[key].tween.remove();
+    }
+
+    this.world.destroyBody(this.enemies[key].body);
+    this.enemies[key].destroy();
+    delete this.enemies[key];
   }
 
   removeEnemies() {
     const keys = Object.keys(this.enemies);
 
     for (let i = 0; i < keys.length; i++) {
-      if (this.enemies[[keys[i]]].tween) {
-        this.enemies[[keys[i]]].tween.remove();
-      }
-      this.world.destroyBody(this.enemies[keys[i]].body);
-      this.enemies[keys[i]].destroy();
-      delete this.enemies[keys[i]];
+      this.removeEnemy(keys[i]);
     }
   }
 
@@ -537,7 +555,6 @@ class playGame extends Phaser.Scene {
         this.killEnemy(key, false);
         this.lives -= 1;
         this.sound.play('skull_damaged');
-        // this.cameras.main.shake(200);
       }.bind(this),
     });
     return delay;

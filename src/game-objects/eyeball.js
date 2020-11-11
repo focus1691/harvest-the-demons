@@ -15,7 +15,6 @@ export default class Enemy extends Sprite {
     this.setScale(scale, scale);
 
     this.setBody('box');
-    this.drawDebug();
 
     this.on('animationcomplete', this.onBloodSplatterEnd, this);
   }
