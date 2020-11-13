@@ -12,6 +12,8 @@ import eyeballsSpriteSheet from '../assets/spritesheets/eyeballs.png';
 import eyeballsJSON from '../assets/spritesheets/eyeballs.json';
 import ghostWarriorSpriteSheet from '../assets/spritesheets/ghost-warrior.png';
 import ghostWarriorJSON from '../assets/spritesheets/ghost-warrior.json';
+import blueMonsterSpriteSheet from '../assets/spritesheets/blue_monster.png';
+import blueMonsterJSON from '../assets/spritesheets/blue_monster.json';
 //* mp3
 import axeSwingSound from '../assets/sound/zapsplat_warfare_weapon_axe_large_object_swing_swoosh_002.mp3';
 import bigEyeKillSound from '../assets/sound/zapsplat_nature_water_pour_splatter_concrete_002_43152.mp3';
@@ -155,6 +157,7 @@ class playGame extends Phaser.Scene {
 
     this.load.atlas('blood', bloodSpriteSheet, bloodSpriteJSON);
     this.load.atlas('ghost_warrior', ghostWarriorSpriteSheet, ghostWarriorJSON);
+    this.load.atlas('blue_monster', blueMonsterSpriteSheet, blueMonsterJSON);
     this.load.atlas('eyeballs', eyeballsSpriteSheet, eyeballsJSON);
 
     this.load.audio('axe_swing', axeSwingSound);
@@ -241,15 +244,20 @@ class playGame extends Phaser.Scene {
     });
     this.world.on('end-contact', (contact, oldManifold) => {});
 
-    //* Create the animations
-    this.createAnimation('fly', 'ghost_warrior', 'fly', 1, 5, '.png', true, -1, 10);
-    this.createAnimation('attack', 'ghost_warrior', 'Attack', 1, 11, '.png', false, 0, 40);
-    this.createAnimation('idle', 'ghost_warrior', 'idle', 1, 5, '.png', true, -1, 10);
-    this.createAnimation('hit', 'ghost_warrior', 'hit', 1, 6, '.png', false, 0, 20);
-    this.createAnimation('death', 'ghost_warrior', 'death', 1, 8, '.png', false, 30);
-    this.createAnimation('eye_twitch', 'eyeballs', 'eyeball', 1, 5, '.png', false, 1, 3);
-    this.createAnimation('blood_splatter', 'blood', 'blood', 0, 29, '.png', false, 0, 30);
+    //* Ghost Warrior animations
+    this.createAnimation('fly', 'ghost_warrior', 'fly', 1, 5, '.png', true, -1, 10, 0);
+    this.createAnimation('attack', 'ghost_warrior', 'Attack', 1, 11, '.png', false, 0, 40, 0);
+    this.createAnimation('idle', 'ghost_warrior', 'idle', 1, 5, '.png', true, -1, 10, 0);
+    this.createAnimation('hit', 'ghost_warrior', 'hit', 1, 6, '.png', false, 0, 20, 0);
+    this.createAnimation('death', 'ghost_warrior', 'death', 1, 8, '.png', false, 30, 0);
 
+    //* Blue Monster animations
+    this.createAnimation('blue_monster_fly', 'blue_monster', 'flying_monster_blue_flying_', 0, 9, '.png', true, -1, 10, 0);
+
+    this.createAnimation('eye_twitch', 'eyeballs', 'eyeball', 1, 5, '.png', false, 1, 3, 0);
+    this.createAnimation('blood_splatter', 'blood', 'blood', 0, 29, '.png', false, 0, 30, 0);
+
+    console.log(this.anims);
     this.make.image({
       key: 'background',
       x: 0,
@@ -465,6 +473,7 @@ class playGame extends Phaser.Scene {
       }
 
       if (!playerGotHit) {
+        this.enemies[label].anims.stop();
         this.enemies[label].play('blood_splatter');
         this.world.destroyBody(this.enemies[label].body);
       } else {
@@ -531,7 +540,7 @@ class playGame extends Phaser.Scene {
       scene: this,
       x,
       y,
-      key: 'demon_eye',
+      key: 'blue_monster',
       label: key,
       bigEye,
     });
@@ -558,8 +567,12 @@ class playGame extends Phaser.Scene {
       },
       delay,
       duration,
+      onStart: function() {
+        this.enemies[key].play('blue_monster_fly');
+      }.bind(this),
       onUpdate: function () {
         this.enemies[key].setPosition(this.enemies[key].x, this.enemies[key].y);
+        this.enemies[key].drawDebug();
       }.bind(this),
       onComplete: function () {
         this.killEnemy(key, false);
@@ -589,19 +602,42 @@ class playGame extends Phaser.Scene {
     return { x: Between(0, W / 2 - 75 * assetsDPR * 2), y: 0 };
   }
 
-  createAnimation(key, name, prefix, start, end, suffix, yoyo, repeat, frameRate) {
-    this.anims.create({
-      key: key,
-      frames: this.anims.generateFrameNames(name, {
-        prefix,
-        start,
-        end,
-        suffix,
-      }),
-      frameRate,
-      yoyo,
-      repeat,
-    });
+  createAnimation(key, name, prefix, start, end, suffix, yoyo, repeat, frameRate, zeroPad) {
+
+    if (key === 'blue_monster_fly') {
+      console.table({
+        key, name, prefix, start, end, suffix, yoyo, repeat, frameRate, zeroPad
+      })
+
+      var res = this.anims.create({
+        key: key,
+        frames: this.anims.generateFrameNames(name, {
+          prefix,
+          start,
+          end,
+          suffix,
+          zeroPad,
+        }),
+        frameRate,
+        yoyo,
+        repeat,
+      });
+      console.log(res);
+    } else {
+      this.anims.create({
+        key: key,
+        frames: this.anims.generateFrameNames(name, {
+          prefix,
+          start,
+          end,
+          suffix,
+          zeroPad,
+        }),
+        frameRate,
+        yoyo,
+        repeat,
+      });
+    }
   }
 
   animateEyes() {
