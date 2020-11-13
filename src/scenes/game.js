@@ -84,6 +84,7 @@ class playGame extends Phaser.Scene {
     this.hzMS = (1 / 60) * 1000;
     this.afk = false;
     this.level = level || 0;
+    this.gameOver = false;
     this.score = 0;
     this.lives = 5;
     this.best = localStorage.getItem('best_score') ? parseInt(localStorage.getItem('best_score'), 10) : 0;
@@ -240,10 +241,6 @@ class playGame extends Phaser.Scene {
           }
         }
       }
-
-      if (this.remainingTargets === 0) {
-        this.roundOver();
-      }
     });
     this.world.on('end-contact', (contact, oldManifold) => {});
 
@@ -278,6 +275,7 @@ class playGame extends Phaser.Scene {
       'wake',
       function () {
         this.initEnemies();
+        this.gameOver = false;
       },
       this
     );
@@ -378,40 +376,51 @@ class playGame extends Phaser.Scene {
   }
 
   update(time, delta) {
-    this.accumMS += delta;
-
-    if (this.accumMS >= this.hzMS) {
-      if (!this.player.isAttacking() && !this.afk) {
-        //  Project a line from the center of the circle to the pointer
-        this.targetLine.x2 = this.input.activePointer.worldX;
-        this.targetLine.y2 = this.input.activePointer.worldY;
-
-        this.player.update(this.targetLine);
-
-        // this.player.left.drawDebug();
-        // this.player.right.drawDebug();
-      }
+    if (this.remainingTargets === 0 && !this.gameOver) {
+      this.gameOver = true;
+      this.endLevel();
     }
 
-    while (this.accumMS >= this.hzMS) {
-      this.accumMS -= this.hzMS;
-      this.world.step(1 / 30);
-      this.world.clearForces();
+    if (!this.gameOver) {
+      this.accumMS += delta;
+      if (this.accumMS >= this.hzMS) {
+        if (!this.player.isAttacking() && !this.afk) {
+          //  Project a line from the center of the circle to the pointer
+          this.targetLine.x2 = this.input.activePointer.worldX;
+          this.targetLine.y2 = this.input.activePointer.worldY;
+  
+          this.player.update(this.targetLine);
+  
+          // this.player.left.drawDebug();
+          // this.player.right.drawDebug();
+        }
+      }
+  
+      while (this.accumMS >= this.hzMS) {
+        this.accumMS -= this.hzMS;
+        this.world.step(1 / 30);
+        this.world.clearForces();
+      }
     }
   }
 
-  roundOver() {
+  endLevel() {
     if (this.score > this.best) {
       localStorage.setItem('best_score', this.score);
       this.best = this.score;
     }
+
+    this.removeEnemies();
+    this.healthBar.restore();
+    this.energyBar.restore();
+    this.sound.stopByKey('disturbing_piano_string');
+    this.time.addEvent({ delay: 2000, callback: this.chooseNextLevel, callbackScope: this, repeat: 0 });
+  }
+  
+  chooseNextLevel() {
     if (this.level < this.levels.length - 1) {
       this.scene.sleep('playGame');
       this.level += 1;
-      this.removeEnemies();
-      this.healthBar.restore();
-      this.energyBar.restore();
-      this.sound.stopByKey('disturbing_piano_string');
       this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTargets;
       this.scene.launch('scoreScene');
     } else {
@@ -471,7 +480,6 @@ class playGame extends Phaser.Scene {
   }
 
   initEnemies() {
-    console.log('initialise enemies', initCount++);
     var delay = 0;
     // Destructure Level props
     const { minDelay, maxDelay, duration, targets, bigTargets } = this.levels[this.level];
