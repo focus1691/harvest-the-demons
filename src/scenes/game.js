@@ -262,7 +262,7 @@ class playGame extends Phaser.Scene {
     this.createAnimation('yellow_monster_die', 'yellow_monster', 'flying_monster_yellow_die_', 0, 3, '.png', true, 0, 10);
     this.createAnimation('grey_monster_die', 'grey_monster', 'flying_monster_grey_die_', 0, 3, '.png', true, 0, 20);
 
-    this.createAnimation('blood_splatter', 'blood', 'blood', 0, 29, '.png', false, 0, 30, 0);
+    this.createAnimation('blood_splatter', 'blood', 'blood', 0, 29, '.png', false, 0, 75, 0);
 
     this.make.image({
       key: 'background',
@@ -456,6 +456,11 @@ class playGame extends Phaser.Scene {
         this.enemies[label].anims.stop();
         this.enemies[label].play(`${this.enemies[label].colour}_monster_die`);
         this.world.destroyBody(this.enemies[label].body);
+        this.time.addEvent({ delay: 1000, callback: function() {
+          if (this.enemies[label]) {
+            this.enemies[label].play('blood_splatter');
+          }
+        }, callbackScope: this, repeat: 0 });
       } else {
         this.removeEnemy(label);
       }
