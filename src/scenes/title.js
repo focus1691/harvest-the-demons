@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 // Images
-import backgroundImg from '../assets/images/background.jpg';
+import backgroundImg from '../assets/images/2_game_background.png';
 import constants from '../assets/configs/constants';
 import { alignGrid } from '../assets/configs/alignGrid';
 import { assetsDPR } from '../index';
@@ -37,9 +37,9 @@ export default class TitleScene extends Phaser.Scene {
     const title = this.add.text(0, 0, 'Harvest the Demons', {
       fontSize: `${48 * assetsDPR}px`,
       fontFamily: constants.styles.text.fontFamily,
-      stroke: '#660000',
+      stroke: '#af111c',
       strokeThickness: 10,
-      color: '#660000',
+      color: '#af111c',
     });
 
     const playButton = this.add
@@ -50,8 +50,8 @@ export default class TitleScene extends Phaser.Scene {
       })
       .setInteractive()
       .on('pointerover', function () {
-        this.setColor('#660000');
-        this.setStroke('#660000');
+        this.setColor('#af111c');
+        this.setStroke('#af111c');
       })
       .on('pointerout', function () {
         this.setColor('white');

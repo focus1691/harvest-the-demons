@@ -1,10 +1,10 @@
 import * as Planck from 'planck-js';
 // Images
-import backgroundImg from '../assets/images/background.jpg';
+import backgroundImg from '../assets/images/2_game_background.png';
 import demonEyeImg from '../assets/images/demon-eye.png';
 import soundOnImg from '../assets/images/white_soundOn.png';
 import soundOffImg from '../assets/images/white_soundOff.png';
-import skullImg from '../assets/images/skull.png';
+import skullImg from '../assets/images/__red_hell_portal_horns_lava_000.png';
 //* Spritesheets
 import bloodSpriteSheet from '../assets/spritesheets/blood_splatter.png';
 import bloodSpriteJSON from '../assets/spritesheets/blood_splatter.json';
@@ -326,9 +326,9 @@ class playGame extends Phaser.Scene {
     this.circle = new Phaser.Geom.Circle(circleX, circleY, circleR);
     this.targetLine = new Phaser.Geom.Line(circleX, circleY, circleX, circleY);
 
-    var graphics = this.add.graphics({ fillStyle: { color: 0xff0000 } });
-    graphics.fillCircleShape(this.circle);
-    graphics.setAlpha(0.1);
+    // var graphics = this.add.graphics({ fillStyle: { color: 0xff0000 } });
+    // graphics.fillCircleShape(this.circle);
+    // graphics.setAlpha(0.1);
 
     //* Skull
     this.skull = new Skull({ scene: this, x: 0, y: 0, key: 'skull', shapeData: this.cache.json.get('skull_shapes').skull, circleX, circleY, circleR });
