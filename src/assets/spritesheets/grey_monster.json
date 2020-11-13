@@ -10,7 +10,7 @@
 			"scale": 0.5,
 			"frames": [
 				{
-					"filename": "flying_monster_grey_flying_snapping_06.png",
+					"filename": "flying_monster_grey_flying_snapping_6.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -31,7 +31,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_die_01.png",
+					"filename": "flying_monster_grey_die_1.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -52,7 +52,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_die_02.png",
+					"filename": "flying_monster_grey_die_2.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -73,7 +73,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_die_03.png",
+					"filename": "flying_monster_grey_die_3.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -94,7 +94,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_snapping_04.png",
+					"filename": "flying_monster_grey_flying_snapping_4.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -115,7 +115,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_die_00.png",
+					"filename": "flying_monster_grey_die_0.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -136,7 +136,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_00.png",
+					"filename": "flying_monster_grey_flying_0.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -157,7 +157,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_06.png",
+					"filename": "flying_monster_grey_flying_6.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -178,7 +178,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_snapping_00.png",
+					"filename": "flying_monster_grey_flying_snapping_0.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -199,7 +199,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_snapping_02.png",
+					"filename": "flying_monster_grey_flying_snapping_2.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -220,7 +220,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_snapping_03.png",
+					"filename": "flying_monster_grey_flying_snapping_3.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -241,7 +241,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_03.png",
+					"filename": "flying_monster_grey_flying_3.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -262,7 +262,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_snapping_07.png",
+					"filename": "flying_monster_grey_flying_snapping_7.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -283,7 +283,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_01.png",
+					"filename": "flying_monster_grey_flying_1.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -304,7 +304,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_snapping_01.png",
+					"filename": "flying_monster_grey_flying_snapping_1.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -325,7 +325,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_07.png",
+					"filename": "flying_monster_grey_flying_7.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -346,7 +346,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_snapping_05.png",
+					"filename": "flying_monster_grey_flying_snapping_5.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -367,7 +367,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_08.png",
+					"filename": "flying_monster_grey_flying_8.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -388,7 +388,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_09.png",
+					"filename": "flying_monster_grey_flying_9.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -409,7 +409,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_05.png",
+					"filename": "flying_monster_grey_flying_5.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -430,7 +430,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_04.png",
+					"filename": "flying_monster_grey_flying_4.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -472,7 +472,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_snapping_09.png",
+					"filename": "flying_monster_grey_flying_snapping_9.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -514,7 +514,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_02.png",
+					"filename": "flying_monster_grey_flying_2.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
@@ -577,7 +577,7 @@
 					}
 				},
 				{
-					"filename": "flying_monster_grey_flying_snapping_08.png",
+					"filename": "flying_monster_grey_flying_snapping_8.png",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {

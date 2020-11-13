@@ -12,8 +12,24 @@ import eyeballsSpriteSheet from '../assets/spritesheets/eyeballs.png';
 import eyeballsJSON from '../assets/spritesheets/eyeballs.json';
 import ghostWarriorSpriteSheet from '../assets/spritesheets/ghost-warrior.png';
 import ghostWarriorJSON from '../assets/spritesheets/ghost-warrior.json';
+
 import blueMonsterSpriteSheet from '../assets/spritesheets/blue_monster.png';
 import blueMonsterJSON from '../assets/spritesheets/blue_monster.json';
+
+import blackMonsterSpriteSheet from '../assets/spritesheets/black_monster.png';
+import blackMonsterJSON from '../assets/spritesheets/black_monster.json';
+
+import greenMonsterSpriteSheet from '../assets/spritesheets/green_monster.png';
+import greenMonsterJSON from '../assets/spritesheets/green_monster.json';
+
+import greyMonsterSpriteSheet from '../assets/spritesheets/grey_monster.png';
+import greyMonsterJSON from '../assets/spritesheets/grey_monster.json';
+
+import redMonsterSpriteSheet from '../assets/spritesheets/red_monster.png';
+import redMonsterJSON from '../assets/spritesheets/red_monster.json';
+
+import yellowMonsterSpriteSheet from '../assets/spritesheets/yellow_monster.png';
+import yellowMonsterJSON from '../assets/spritesheets/yellow_monster.json';
 //* mp3
 import axeSwingSound from '../assets/sound/zapsplat_warfare_weapon_axe_large_object_swing_swoosh_002.mp3';
 import bigEyeKillSound from '../assets/sound/zapsplat_nature_water_pour_splatter_concrete_002_43152.mp3';
@@ -52,6 +68,8 @@ import healthBarRightEdge from '../assets/images/healthbar/red/meter_bar_right_e
 import healthBarRightFrame from '../assets/images/healthbar/red/meter_bar_holder_right_edge_red.png';
 import healthMeterBadge from '../assets/images/healthbar/red/meter_icon_holder_red.png';
 import healthMeterIcon from '../assets/images/healthbar/icons/health.png';
+
+const colours = ['black', 'blue', 'green', 'grey', 'red', 'yellow'];
 
 class playGame extends Phaser.Scene {
   constructor() {
@@ -158,7 +176,14 @@ class playGame extends Phaser.Scene {
 
     this.load.atlas('blood', bloodSpriteSheet, bloodSpriteJSON);
     this.load.atlas('ghost_warrior', ghostWarriorSpriteSheet, ghostWarriorJSON);
+
     this.load.atlas('blue_monster', blueMonsterSpriteSheet, blueMonsterJSON);
+    this.load.atlas('black_monster', blackMonsterSpriteSheet, blackMonsterJSON);
+    this.load.atlas('green_monster', greenMonsterSpriteSheet, greenMonsterJSON);
+    this.load.atlas('red_monster', redMonsterSpriteSheet, redMonsterJSON);
+    this.load.atlas('yellow_monster', yellowMonsterSpriteSheet, yellowMonsterJSON);
+    this.load.atlas('grey_monster', greyMonsterSpriteSheet, greyMonsterJSON);
+
     this.load.atlas('eyeballs', eyeballsSpriteSheet, eyeballsJSON);
 
     this.load.audio('axe_swing', axeSwingSound);
@@ -233,7 +258,12 @@ class playGame extends Phaser.Scene {
     this.createAnimation('death', 'ghost_warrior', 'death', 1, 8, '.png', false, 30, 0);
 
     //* Blue Monster animations
-    this.createAnimation('blue_monster_fly', 'blue_monster', 'flying_monster_blue_flying_', 0, 9, '.png', true, -1, 10, 0);
+    this.createAnimation('blue_monster_fly', 'blue_monster', 'flying_monster_blue_flying_', 0, 11, '.png', true, -1, 30, 0);
+    this.createAnimation('black_monster_fly', 'black_monster', 'flying_monster_black_flying_', 0, 11, '.png', true, -1, 30, 0);
+    this.createAnimation('green_monster_fly', 'green_monster', 'flying_monster_green_flying_', 0, 11, '.png', true, -1, 30, 0);
+    this.createAnimation('red_monster_fly', 'red_monster', 'flying_monster_red_flying_', 0, 11, '.png', true, -1, 30, 0);
+    this.createAnimation('yellow_monster_fly', 'yellow_monster', 'flying_monster_yellow_flying_', 0, 11, '.png', true, -1, 30, 0);
+    this.createAnimation('grey_monster_fly', 'grey_monster', 'flying_monster_grey_flying_', 0, 11, '.png', true, -1, 30, 0);
 
     this.createAnimation('eye_twitch', 'eyeballs', 'eyeball', 1, 5, '.png', false, 1, 3, 0);
     this.createAnimation('blood_splatter', 'blood', 'blood', 0, 29, '.png', false, 0, 30, 0);
@@ -250,35 +280,25 @@ class playGame extends Phaser.Scene {
     //* Right
     this.rightEye = this.make.sprite({
       key: 'eyeballs',
-      x: this.cameras.main.width - this.cache.json.get('eyeballs').textures[0].size.h,
+      x: this.cameras.main.width - this.cache.json.get('eyeballs').textures[0].size.h / 2,
       y: 100,
       flipX: true,
       height: this.cameras.main.height * assetsDPR,
       rotation: -Math.PI / 2,
       origin: { x: 1, y: 0 },
-      scale: { x: 3, y: 5 },
-    });
-
-    //* Bottom
-    this.bottomEye = this.make.sprite({
-      key: 'eyeballs',
-      x: 0,
-      y: this.cameras.main.height,
-      width: this.cameras.main.width * assetsDPR,
-      origin: { x: 0, y: 1 },
-      scale: { x: 2.5, y: 2.5 },
+      scale: { x: 3, y: 3 },
     });
 
     //* Left
     this.LeftEye = this.make.sprite({
       key: 'eyeballs',
-      x: this.cache.json.get('eyeballs').textures[0].size.h,
+      x: this.cache.json.get('eyeballs').textures[0].size.h / 2,
       y: 100,
       flipX: true,
       height: this.cameras.main.height * assetsDPR,
       rotation: Math.PI / 2,
       origin: { x: 0, y: 0 },
-      scale: { x: 3, y: 5 },
+      scale: { x: 3, y: 3 },
     });
 
     this.time.addEvent({ startAt: 1000, delay: 6000, callback: this.animateEyes, callbackScope: this });
@@ -515,13 +535,16 @@ class playGame extends Phaser.Scene {
   createEnemy(delay, min, max, duration, bigEye) {
     const { x, y } = this.getEnemyPosition(Between(1, 4));
     const key = uuidv4();
+    const colour = colours[Math.floor(Math.random() * 6 - 0)]; // random colour
     this.enemies[key] = new Eyeball({
       scene: this,
       x,
       y,
-      key: 'blue_monster',
+      key: `${colour}_monster`,
       label: key,
       bigEye,
+      colour,
+      flip: x < this.skull.x,
     });
     this.enemies[key].body.setAngle(Math.atan2(y - this.skull.y, x - this.skull.x));
     delay += Between(min, max);
@@ -598,7 +621,6 @@ class playGame extends Phaser.Scene {
     this.sound.play('disturbing_piano_string');
     this.LeftEye.play('eye_twitch');
     this.rightEye.play('eye_twitch');
-    this.bottomEye.play('eye_twitch');
   }
 
   eyeAnimComplete() {

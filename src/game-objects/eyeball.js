@@ -10,11 +10,13 @@ export default class Enemy extends Sprite {
     this.isAlive = true;
     this.bigEye = config.bigEye;
 
+    this.setFlipY(config.flip);
+
     let scale = this.bigEye ? 1 / (assetsDPR / 3) : 1 / assetsDPR;
 
     this.setScale(scale, scale);
 
-    this.play('blue_monster_fly');
+    this.play(`${config.colour}_monster_fly`);
 
     this.setBody('box');
   }
