@@ -170,7 +170,11 @@ export default class Player {
         let key = this.scene.meleeContactList[i];
         if (this.scene.enemies[key]) {
           let isBigEye = this.scene.enemies[key].bigEye;
-          this.scene.killEnemy(key, false);
+          this.scene.killEnemy({
+            key,
+            isPlayerHit: false,
+            meleeKill: true,
+          });
           this.scene.onEnemyKilled(isBigEye);
         }
       }

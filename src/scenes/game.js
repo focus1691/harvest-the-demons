@@ -210,14 +210,22 @@ class playGame extends Phaser.Scene {
         // Conditions for the axe to kill the small eye
         if (this.enemies[enemyKey].isAlive && !this.enemies[enemyKey].bigEye && !this.player.isAttacking()) {
           let isBigEye = this.enemies[enemyKey].bigEye;
-          this.killEnemy(enemyKey, false);
+          this.killEnemy({
+            key: enemyKey,
+            isPlayerHit: false,
+            meleeKill: false,
+          });
           this.onEnemyKilled(isBigEye);
         }
       } else if ((a === 'body' || b === 'body') && (this.enemies[a] || this.enemies[b])) {
         const enemyKey = b === 'body' ? a : b;
         if (this.enemies[enemyKey].isAlive) {
           let isBigEye = this.enemies[enemyKey].bigEye;
-          this.killEnemy(enemyKey, true);
+          this.killEnemy({
+            key: enemyKey,
+            isPlayerHit: true,
+            meleeKill: false,
+          });
           this.onPlayerHit(isBigEye);
         }
       }
@@ -230,7 +238,11 @@ class playGame extends Phaser.Scene {
 
           if (this.player.axeSwinging || (timeSinceLastAttack < 400 && timeSinceLastAttack > 16)) {
             let isBigEye = this.enemies[enemyKey].bigEye;
-            this.killEnemy(enemyKey, false);
+            this.killEnemy({
+              key: enemyKey,
+              isPlayerHit: false,
+              meleeKill: true,
+            });
             this.onEnemyKilled(isBigEye);
           } else if (!this.meleeContactList.includes(enemyKey)) {
             this.meleeContactList.push(enemyKey);
@@ -445,24 +457,28 @@ class playGame extends Phaser.Scene {
     this.scoreText.setText(`${this.score}`);
   }
 
-  killEnemy(label, playerGotHit) {
-    if (this.enemies[label]) {
-      this.enemies[label].isAlive = false;
-      if (this.enemies[label].tween) {
-        this.enemies[label].tween.remove();
+  killEnemy({key, isPlayerHit, meleeKill}) {
+    if (this.enemies[key]) {
+      this.enemies[key].isAlive = false;
+      if (this.enemies[key].tween) {
+        this.enemies[key].tween.remove();
       }
 
-      if (!playerGotHit) {
-        this.enemies[label].anims.stop();
-        this.enemies[label].play(`${this.enemies[label].colour}_monster_die`);
-        this.world.destroyBody(this.enemies[label].body);
-        this.time.addEvent({ delay: 1000, callback: function() {
-          if (this.enemies[label]) {
-            this.enemies[label].play('blood_splatter');
-          }
-        }, callbackScope: this, repeat: 0 });
+      if (!isPlayerHit) {
+        this.enemies[key].anims.stop();
+        this.enemies[key].play(`${this.enemies[key].colour}_monster_die`);
+        this.world.destroyBody(this.enemies[key].body);
+        if (meleeKill) {
+          this.enemies[key].play('blood_splatter');
+        } else {
+          this.time.addEvent({ delay: 1000, callback: function() {
+            if (this.enemies[key]) {
+              this.enemies[key].play('blood_splatter');
+            }
+          }, callbackScope: this, repeat: 0 });
+        }
       } else {
-        this.removeEnemy(label);
+        this.removeEnemy(key);
       }
       this.remainingTargets -= 1;
     }
@@ -559,7 +575,11 @@ class playGame extends Phaser.Scene {
         // this.enemies[key].drawDebug();
       }.bind(this),
       onComplete: function () {
-        this.killEnemy(key, false);
+        this.killEnemy({
+          key,
+          isPlayerHit: false,
+          meleeKill: false,
+        });
         this.lives -= 1;
         this.sound.play('portal_damaged');
       }.bind(this),
