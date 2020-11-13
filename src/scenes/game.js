@@ -1,15 +1,13 @@
 import * as Planck from 'planck-js';
 // Images
 import backgroundImg from '../assets/images/2_game_background.png';
-import demonEyeImg from '../assets/images/demon-eye.png';
 import soundOnImg from '../assets/images/white_soundOn.png';
 import soundOffImg from '../assets/images/white_soundOff.png';
 import skullImg from '../assets/images/__red_hell_portal_horns_lava_000.png';
 //* Spritesheets
 import bloodSpriteSheet from '../assets/spritesheets/blood_splatter.png';
 import bloodSpriteJSON from '../assets/spritesheets/blood_splatter.json';
-import eyeballsSpriteSheet from '../assets/spritesheets/eyeballs.png';
-import eyeballsJSON from '../assets/spritesheets/eyeballs.json';
+
 import ghostWarriorSpriteSheet from '../assets/spritesheets/ghost-warrior.png';
 import ghostWarriorJSON from '../assets/spritesheets/ghost-warrior.json';
 
@@ -70,6 +68,8 @@ import healthMeterBadge from '../assets/images/healthbar/red/meter_icon_holder_r
 import healthMeterIcon from '../assets/images/healthbar/icons/health.png';
 
 const colours = ['black', 'blue', 'green', 'grey', 'red', 'yellow'];
+
+var initCount = 0;
 
 class playGame extends Phaser.Scene {
   constructor() {
@@ -146,7 +146,6 @@ class playGame extends Phaser.Scene {
 
   preload() {
     this.load.image('background', backgroundImg);
-    this.load.image('demon_eye', demonEyeImg);
     this.load.image('sound_on', soundOnImg);
     this.load.image('sound_off', soundOffImg);
     this.load.image('skull', skullImg);
@@ -183,8 +182,6 @@ class playGame extends Phaser.Scene {
     this.load.atlas('red_monster', redMonsterSpriteSheet, redMonsterJSON);
     this.load.atlas('yellow_monster', yellowMonsterSpriteSheet, yellowMonsterJSON);
     this.load.atlas('grey_monster', greyMonsterSpriteSheet, greyMonsterJSON);
-
-    this.load.atlas('eyeballs', eyeballsSpriteSheet, eyeballsJSON);
 
     this.load.audio('axe_swing', axeSwingSound);
     this.load.audio('big_eye_kill', bigEyeKillSound);
@@ -277,42 +274,13 @@ class playGame extends Phaser.Scene {
       scale: { x: 1.5, y: 1.5 },
     });
 
-    //* Right
-    this.rightEye = this.make.sprite({
-      key: 'eyeballs',
-      x: this.cameras.main.width - this.cache.json.get('eyeballs').textures[0].size.h / 2,
-      y: 100,
-      flipX: true,
-      height: this.cameras.main.height * assetsDPR,
-      rotation: -Math.PI / 2,
-      origin: { x: 1, y: 0 },
-      scale: { x: 3, y: 3 },
-    });
-
-    //* Left
-    this.LeftEye = this.make.sprite({
-      key: 'eyeballs',
-      x: this.cache.json.get('eyeballs').textures[0].size.h / 2,
-      y: 100,
-      flipX: true,
-      height: this.cameras.main.height * assetsDPR,
-      rotation: Math.PI / 2,
-      origin: { x: 0, y: 0 },
-      scale: { x: 3, y: 3 },
-    });
-
-    this.time.addEvent({ startAt: 1000, delay: 6000, callback: this.animateEyes, callbackScope: this });
-
     this.events.on(
       'wake',
       function () {
         this.initEnemies();
-        this.time.addEvent({ startAt: 1000, delay: 6000, callback: this.animateEyes, callbackScope: this });
       },
       this
     );
-
-    this.LeftEye.on('animationcomplete', this.eyeAnimComplete, this);
 
     this.healthBar = new HealthBar(this);
     this.energyBar = new EnergyBar(this);
@@ -502,6 +470,7 @@ class playGame extends Phaser.Scene {
   }
 
   initEnemies() {
+    console.log('initialise enemies', initCount++);
     var delay = 0;
     // Destructure Level props
     const { minDelay, maxDelay, duration, targets, bigTargets } = this.levels[this.level];
@@ -615,16 +584,6 @@ class playGame extends Phaser.Scene {
       yoyo,
       repeat,
     });
-  }
-
-  animateEyes() {
-    this.sound.play('disturbing_piano_string');
-    this.LeftEye.play('eye_twitch');
-    this.rightEye.play('eye_twitch');
-  }
-
-  eyeAnimComplete() {
-    this.sound.stopByKey('disturbing_piano_string');
   }
 
   onToggleSound(pointer, x, y, e) {
