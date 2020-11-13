@@ -105,8 +105,8 @@ class playGame extends Phaser.Scene {
       {
         targets: 0,
         bigTargets: 10,
-        minDelay: 1000,
-        maxDelay: 2000,
+        minDelay: 2000,
+        maxDelay: 3000,
         duration: 4000,
       },
       {
