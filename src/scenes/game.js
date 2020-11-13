@@ -258,12 +258,12 @@ class playGame extends Phaser.Scene {
     this.createAnimation('death', 'ghost_warrior', 'death', 1, 8, '.png', false, 30, 0);
 
     //* Blue Monster animations
-    this.createAnimation('blue_monster_fly', 'blue_monster', 'flying_monster_blue_flying_', 0, 11, '.png', true, -1, 30, 0);
-    this.createAnimation('black_monster_fly', 'black_monster', 'flying_monster_black_flying_', 0, 11, '.png', true, -1, 30, 0);
-    this.createAnimation('green_monster_fly', 'green_monster', 'flying_monster_green_flying_', 0, 11, '.png', true, -1, 30, 0);
-    this.createAnimation('red_monster_fly', 'red_monster', 'flying_monster_red_flying_', 0, 11, '.png', true, -1, 30, 0);
-    this.createAnimation('yellow_monster_fly', 'yellow_monster', 'flying_monster_yellow_flying_', 0, 11, '.png', true, -1, 30, 0);
-    this.createAnimation('grey_monster_fly', 'grey_monster', 'flying_monster_grey_flying_', 0, 11, '.png', true, -1, 30, 0);
+    this.createAnimation('blue_monster_fly', 'blue_monster', 'flying_monster_blue_flying_', 0, 11, '.png', true, -1, 10, 0);
+    this.createAnimation('black_monster_fly', 'black_monster', 'flying_monster_black_flying_', 0, 11, '.png', true, -1, 10, 0);
+    this.createAnimation('green_monster_fly', 'green_monster', 'flying_monster_green_flying_', 0, 11, '.png', true, -1, 10, 0);
+    this.createAnimation('red_monster_fly', 'red_monster', 'flying_monster_red_flying_', 0, 11, '.png', true, -1, 10, 0);
+    this.createAnimation('yellow_monster_fly', 'yellow_monster', 'flying_monster_yellow_flying_', 0, 11, '.png', true, -1, 10, 0);
+    this.createAnimation('grey_monster_fly', 'grey_monster', 'flying_monster_grey_flying_', 0, 11, '.png', true, -1, 10, 0);
 
     this.createAnimation('eye_twitch', 'eyeballs', 'eyeball', 1, 5, '.png', false, 1, 3, 0);
     this.createAnimation('blood_splatter', 'blood', 'blood', 0, 29, '.png', false, 0, 30, 0);
@@ -420,8 +420,8 @@ class playGame extends Phaser.Scene {
 
         this.player.update(this.targetLine);
 
-        this.player.left.drawDebug();
-        this.player.right.drawDebug();
+        // this.player.left.drawDebug();
+        // this.player.right.drawDebug();
       }
     }
 
@@ -571,7 +571,7 @@ class playGame extends Phaser.Scene {
       duration,
       onUpdate: function () {
         this.enemies[key].setPosition(this.enemies[key].x, this.enemies[key].y);
-        this.enemies[key].drawDebug();
+        // this.enemies[key].drawDebug();
       }.bind(this),
       onComplete: function () {
         this.killEnemy(key, false);
