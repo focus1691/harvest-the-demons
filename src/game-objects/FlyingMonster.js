@@ -7,6 +7,7 @@ export default class Enemy extends Sprite {
 
     this.scene = config.scene;
     this.label = config.label;
+    this.colour = config.colour;
     this.isAlive = true;
     this.bigEye = config.bigEye;
 

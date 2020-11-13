@@ -3,7 +3,7 @@ import * as Planck from 'planck-js';
 import backgroundImg from '../assets/images/2_game_background.png';
 import soundOnImg from '../assets/images/white_soundOn.png';
 import soundOffImg from '../assets/images/white_soundOff.png';
-import skullImg from '../assets/images/__red_hell_portal_horns_lava_000.png';
+import portalImg from '../assets/images/__red_hell_portal_horns_lava_000.png';
 //* Spritesheets
 import bloodSpriteSheet from '../assets/spritesheets/blood_splatter.png';
 import bloodSpriteJSON from '../assets/spritesheets/blood_splatter.json';
@@ -33,17 +33,16 @@ import axeSwingSound from '../assets/sound/zapsplat_warfare_weapon_axe_large_obj
 import bigEyeKillSound from '../assets/sound/zapsplat_nature_water_pour_splatter_concrete_002_43152.mp3';
 import eyeKillSound from '../assets/sound/zapsplat_impact_body_heavy_splat_squelch_guts_bones_break_13492.mp3';
 import playerHitSound from '../assets/sound/horror_monster_zombie_male_groan_005.mp3';
-import skullHitSound from '../assets/sound/zapsplat_horror_zombie_male_groan_growl_11766.mp3';
+import portalHitSound from '../assets/sound/zapsplat_horror_zombie_male_groan_growl_11766.mp3';
 import scaryMusic from '../assets/sound/smartsound_CINEMATIC_HORROR_Piano_Bow_String_Broken_Low_Slow_01.mp3';
 // Game Objects
 import Player from '../game-objects/player';
 import EnergyBar from '../game-objects/energyBar';
-import Eyeball from '../game-objects/eyeball';
+import FlyingMonster from '../game-objects/FlyingMonster';
 import HealthBar from '../game-objects/healthBar';
-import Skull from '../game-objects/skull';
+import Portal from '../game-objects/Portal';
 //* Physics
 import ghostWarriorShape from '../assets/PhysicsEditor/ghost_warrior.json';
-import skullShape from '../assets/PhysicsEditor/skull.json';
 import { Between } from 'phaser/src/math/';
 import { v4 as uuidv4 } from 'uuid';
 import { assetsDPR } from '..';
@@ -68,8 +67,6 @@ import healthMeterBadge from '../assets/images/healthbar/red/meter_icon_holder_r
 import healthMeterIcon from '../assets/images/healthbar/icons/health.png';
 
 const colours = ['black', 'blue', 'green', 'grey', 'red', 'yellow'];
-
-var initCount = 0;
 
 class playGame extends Phaser.Scene {
   constructor() {
@@ -149,7 +146,7 @@ class playGame extends Phaser.Scene {
     this.load.image('background', backgroundImg);
     this.load.image('sound_on', soundOnImg);
     this.load.image('sound_off', soundOffImg);
-    this.load.image('skull', skullImg);
+    this.load.image('portal', portalImg);
 
     // Health Bar
     this.load.image('health_bar_left_frame', healthBarLeftFrame);
@@ -172,7 +169,6 @@ class playGame extends Phaser.Scene {
     this.load.image('energy_bar_icon', energyMeterIcon);
 
     this.load.json('ghost_warrior_shapes', ghostWarriorShape);
-    this.load.json('skull_shapes', skullShape);
 
     this.load.atlas('blood', bloodSpriteSheet, bloodSpriteJSON);
     this.load.atlas('ghost_warrior', ghostWarriorSpriteSheet, ghostWarriorJSON);
@@ -188,7 +184,7 @@ class playGame extends Phaser.Scene {
     this.load.audio('big_eye_kill', bigEyeKillSound);
     this.load.audio('eye_kill', eyeKillSound);
     this.load.audio('player_damaged', playerHitSound);
-    this.load.audio('skull_damaged', skullHitSound);
+    this.load.audio('portal_damaged', portalHitSound);
     this.load.audio('disturbing_piano_string', scaryMusic);
 
     alignGrid.create({ scene: this, rows: 10, columns: 10 });
@@ -251,15 +247,21 @@ class playGame extends Phaser.Scene {
     this.createAnimation('hit', 'ghost_warrior', 'hit', 1, 6, '.png', false, 0, 20, 0);
     this.createAnimation('death', 'ghost_warrior', 'death', 1, 8, '.png', false, 30, 0);
 
-    //* Blue Monster animations
-    this.createAnimation('blue_monster_fly', 'blue_monster', 'flying_monster_blue_flying_', 0, 11, '.png', true, -1, 10, 0);
-    this.createAnimation('black_monster_fly', 'black_monster', 'flying_monster_black_flying_', 0, 11, '.png', true, -1, 10, 0);
-    this.createAnimation('green_monster_fly', 'green_monster', 'flying_monster_green_flying_', 0, 11, '.png', true, -1, 10, 0);
-    this.createAnimation('red_monster_fly', 'red_monster', 'flying_monster_red_flying_', 0, 11, '.png', true, -1, 10, 0);
-    this.createAnimation('yellow_monster_fly', 'yellow_monster', 'flying_monster_yellow_flying_', 0, 11, '.png', true, -1, 10, 0);
-    this.createAnimation('grey_monster_fly', 'grey_monster', 'flying_monster_grey_flying_', 0, 11, '.png', true, -1, 10, 0);
+    //* Monster animations
+    this.createAnimation('blue_monster_fly', 'blue_monster', 'flying_monster_blue_flying_', 0, 11, '.png', true, -1, 10);
+    this.createAnimation('black_monster_fly', 'black_monster', 'flying_monster_black_flying_', 0, 11, '.png', true, -1, 10);
+    this.createAnimation('green_monster_fly', 'green_monster', 'flying_monster_green_flying_', 0, 11, '.png', true, -1, 10);
+    this.createAnimation('red_monster_fly', 'red_monster', 'flying_monster_red_flying_', 0, 11, '.png', true, -1, 10);
+    this.createAnimation('yellow_monster_fly', 'yellow_monster', 'flying_monster_yellow_flying_', 0, 11, '.png', true, -1, 10);
+    this.createAnimation('grey_monster_fly', 'grey_monster', 'flying_monster_grey_flying_', 0, 11, '.png', true, -1, 10);
 
-    this.createAnimation('eye_twitch', 'eyeballs', 'eyeball', 1, 5, '.png', false, 1, 3, 0);
+    this.createAnimation('blue_monster_die', 'blue_monster', 'flying_monster_blue_die_', 0, 3, '.png', true, 0, 10);
+    this.createAnimation('black_monster_die', 'black_monster', 'flying_monster_black_die_', 0, 3, '.png', true, 0, 10);
+    this.createAnimation('green_monster_die', 'green_monster', 'flying_monster_green_die_', 0, 3, '.png', true, 0, 10);
+    this.createAnimation('red_monster_die', 'red_monster', 'flying_monster_red_die_', 0, 3, '.png', true, 0, 10);
+    this.createAnimation('yellow_monster_die', 'yellow_monster', 'flying_monster_yellow_die_', 0, 3, '.png', true, 0, 10);
+    this.createAnimation('grey_monster_die', 'grey_monster', 'flying_monster_grey_die_', 0, 3, '.png', true, 0, 20);
+
     this.createAnimation('blood_splatter', 'blood', 'blood', 0, 29, '.png', false, 0, 30, 0);
 
     this.make.image({
@@ -296,9 +298,9 @@ class playGame extends Phaser.Scene {
     // graphics.fillCircleShape(this.circle);
     // graphics.setAlpha(0.1);
 
-    //* Skull
-    this.skull = new Skull({ scene: this, x: 0, y: 0, key: 'skull', shapeData: this.cache.json.get('skull_shapes').skull, circleX, circleY, circleR });
-    this.skull.setPosition(this.targetLine.x1, this.targetLine.y1);
+    //* Portal
+    this.portal = new Portal({ scene: this, x: 0, y: 0, key: 'portal'});
+    this.portal.setPosition(this.targetLine.x1, this.targetLine.y1);
 
     //* Ghost Warrior
     var shapes = this.cache.json.get('ghost_warrior_shapes');
@@ -452,7 +454,7 @@ class playGame extends Phaser.Scene {
 
       if (!playerGotHit) {
         this.enemies[label].anims.stop();
-        this.enemies[label].play('blood_splatter');
+        this.enemies[label].play(`${this.enemies[label].colour}_monster_die`);
         this.world.destroyBody(this.enemies[label].body);
       } else {
         this.removeEnemy(label);
@@ -514,7 +516,7 @@ class playGame extends Phaser.Scene {
     const { x, y } = this.getEnemyPosition(Between(1, 4));
     const key = uuidv4();
     const colour = colours[Math.floor(Math.random() * 6 - 0)]; // random colour
-    this.enemies[key] = new Eyeball({
+    this.enemies[key] = new FlyingMonster({
       scene: this,
       x,
       y,
@@ -522,9 +524,9 @@ class playGame extends Phaser.Scene {
       label: key,
       bigEye,
       colour,
-      flip: x < this.skull.x,
+      flip: x < this.portal.x,
     });
-    this.enemies[key].body.setAngle(Math.atan2(y - this.skull.y, x - this.skull.x));
+    this.enemies[key].body.setAngle(Math.atan2(y - this.portal.y, x - this.portal.x));
     delay += Between(min, max);
 
     this.enemies[key].tween = this.tweens.add({
@@ -534,11 +536,11 @@ class playGame extends Phaser.Scene {
       },
       x: {
         from: x,
-        to: this.skull.x,
+        to: this.portal.x,
       },
       y: {
         from: y,
-        to: this.skull.y,
+        to: this.portal.y,
       },
       alpha: {
         start: 0,
@@ -554,7 +556,7 @@ class playGame extends Phaser.Scene {
       onComplete: function () {
         this.killEnemy(key, false);
         this.lives -= 1;
-        this.sound.play('skull_damaged');
+        this.sound.play('portal_damaged');
       }.bind(this),
     });
     return delay;
@@ -579,7 +581,7 @@ class playGame extends Phaser.Scene {
     return { x: Between(0, W / 2 - 75 * assetsDPR * 2), y: 0 };
   }
 
-  createAnimation(key, name, prefix, start, end, suffix, yoyo, repeat, frameRate, zeroPad) {
+  createAnimation(key, name, prefix, start, end, suffix, yoyo, repeat, frameRate) {
     this.anims.create({
       key: key,
       frames: this.anims.generateFrameNames(name, {
@@ -587,7 +589,6 @@ class playGame extends Phaser.Scene {
         start,
         end,
         suffix,
-        zeroPad,
       }),
       frameRate,
       yoyo,
