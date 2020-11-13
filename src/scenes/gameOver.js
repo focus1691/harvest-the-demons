@@ -70,7 +70,7 @@ export default class GameOverScene extends Phaser.Scene {
           this.sound.play('demon_theme', {
             loop: true,
           });
-          this.scene.wake('playGame');
+          this.scene.start('playGame');
         },
         this
       );

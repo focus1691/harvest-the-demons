@@ -415,6 +415,7 @@ class playGame extends Phaser.Scene {
       this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTargets;
       this.scene.launch('scoreScene');
     } else {
+      this.scene.stop('playGame');
       this.scene.start('gameOverScene', { score: this.score, best: this.best });
     }
   }
