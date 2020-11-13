@@ -166,15 +166,15 @@ export default class Player {
     const { index } = animationFrame;
 
     if (index > 8) {
-      for (let i = 0; i < this.scene.contactList.length; i++) {
-        let key = this.scene.contactList[i];
+      for (let i = 0; i < this.scene.meleeContactList.length; i++) {
+        let key = this.scene.meleeContactList[i];
         if (this.scene.enemies[key]) {
           let isBigEye = this.scene.enemies[key].bigEye;
           this.scene.killEnemy(key, false);
           this.scene.onEnemyKilled(isBigEye);
         }
       }
-      this.scene.contactList = [];
+      this.scene.meleeContactList = [];
       
       if (index === 8) {
         this.axeSwinging = true;

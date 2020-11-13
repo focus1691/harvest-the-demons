@@ -14,12 +14,8 @@ export default class Enemy extends Sprite {
 
     this.setScale(scale, scale);
 
+    this.play('blue_monster_fly');
+
     this.setBody('box');
-
-    this.on('animationcomplete', this.onBloodSplatterEnd, this);
-  }
-
-  onBloodSplatterEnd() {
-    this.body.setActive(false);
   }
 }

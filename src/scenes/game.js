@@ -122,7 +122,8 @@ class playGame extends Phaser.Scene {
     ];
     this.enemies = {};
     this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTargets;
-    this.contactList = [];
+    this.hitList = [];
+    this.meleeContactList = [];
   }
 
   preload() {
@@ -176,14 +177,8 @@ class playGame extends Phaser.Scene {
     this.scaleFactor = 30;
 
     // Planck event bindings
-    this.world.on('pre-solve', (contact, oldManifold) => {
-      // this.sprites.forEach((s) => s.preSolve(contact, oldManifold))
-      // Object.values(this.enemies).forEach((enemy) => enemy.preSolve(contact, oldManifold));
-    });
-    this.world.on('post-solve', (contact, oldManifold) => {
-      // this.sprites.forEach((s) => s.postSolve(contact, oldManifold))
-      // Object.values(this.enemies).forEach((enemy) => enemy.preSolve(contact, oldManifold));
-    });
+    this.world.on('pre-solve', (contact, oldManifold) => { });
+    this.world.on('post-solve', (contact, oldManifold) => { });
 
     this.world.on('begin-contact', (contact, oldManifold) => {
       const a = contact.getFixtureA().getUserData();
@@ -199,9 +194,7 @@ class playGame extends Phaser.Scene {
           this.killEnemy(enemyKey, false);
           this.onEnemyKilled(isBigEye);
         }
-      }
-      
-      else if ((a === 'body' || b === 'body') && (this.enemies[a] || this.enemies[b])) {
+      } else if ((a === 'body' || b === 'body') && (this.enemies[a] || this.enemies[b])) {
         const enemyKey = b === 'body' ? a : b;
         if (this.enemies[enemyKey].isAlive) {
           let isBigEye = this.enemies[enemyKey].bigEye;
@@ -210,16 +203,6 @@ class playGame extends Phaser.Scene {
         }
       }
 
-      // if ((a === 'melee' || b === 'melee') && (this.enemies[a] || this.enemies[b])) {
-      //   const data = {
-      //     axeSwinging: this.player.axeSwinging,
-      //     labelA: a,
-      //     labelB: b,
-      //     lastAttack: new Date().getTime() - this.player.lastAttack.getTime(),
-      //   };
-      //   console.table(data);
-      // }
-
       if ((a === 'melee' || b === 'melee') && (this.enemies[a] || this.enemies[b])) {
         const enemyKey = b === 'melee' ? a : b;
 
@@ -227,13 +210,11 @@ class playGame extends Phaser.Scene {
           let timeSinceLastAttack = new Date().getTime() - this.player.lastAttack.getTime();
 
           if (this.player.axeSwinging || (timeSinceLastAttack < 400 && timeSinceLastAttack > 16)) {
-            // console.log('KILL *******************************************************************************************************************');
             let isBigEye = this.enemies[enemyKey].bigEye;
             this.killEnemy(enemyKey, false);
             this.onEnemyKilled(isBigEye);
-          }
-          else if (!this.contactList.includes(enemyKey)) {
-            this.contactList.push(enemyKey);
+          } else if (!this.meleeContactList.includes(enemyKey)) {
+            this.meleeContactList.push(enemyKey);
           }
         }
       }
@@ -257,7 +238,6 @@ class playGame extends Phaser.Scene {
     this.createAnimation('eye_twitch', 'eyeballs', 'eyeball', 1, 5, '.png', false, 1, 3, 0);
     this.createAnimation('blood_splatter', 'blood', 'blood', 0, 29, '.png', false, 0, 30, 0);
 
-    console.log(this.anims);
     this.make.image({
       key: 'background',
       x: 0,
@@ -420,8 +400,8 @@ class playGame extends Phaser.Scene {
 
         this.player.update(this.targetLine);
 
-        // this.player.left.drawDebug();
-        // this.player.right.drawDebug();
+        this.player.left.drawDebug();
+        this.player.right.drawDebug();
       }
     }
 
@@ -536,7 +516,6 @@ class playGame extends Phaser.Scene {
     const { x, y } = this.getEnemyPosition(Between(1, 4));
     const key = uuidv4();
     this.enemies[key] = new Eyeball({
-      // world: this.matter.world,
       scene: this,
       x,
       y,
@@ -567,9 +546,6 @@ class playGame extends Phaser.Scene {
       },
       delay,
       duration,
-      onStart: function() {
-        this.enemies[key].play('blue_monster_fly');
-      }.bind(this),
       onUpdate: function () {
         this.enemies[key].setPosition(this.enemies[key].x, this.enemies[key].y);
         this.enemies[key].drawDebug();
@@ -603,41 +579,19 @@ class playGame extends Phaser.Scene {
   }
 
   createAnimation(key, name, prefix, start, end, suffix, yoyo, repeat, frameRate, zeroPad) {
-
-    if (key === 'blue_monster_fly') {
-      console.table({
-        key, name, prefix, start, end, suffix, yoyo, repeat, frameRate, zeroPad
-      })
-
-      var res = this.anims.create({
-        key: key,
-        frames: this.anims.generateFrameNames(name, {
-          prefix,
-          start,
-          end,
-          suffix,
-          zeroPad,
-        }),
-        frameRate,
-        yoyo,
-        repeat,
-      });
-      console.log(res);
-    } else {
-      this.anims.create({
-        key: key,
-        frames: this.anims.generateFrameNames(name, {
-          prefix,
-          start,
-          end,
-          suffix,
-          zeroPad,
-        }),
-        frameRate,
-        yoyo,
-        repeat,
-      });
-    }
+    this.anims.create({
+      key: key,
+      frames: this.anims.generateFrameNames(name, {
+        prefix,
+        start,
+        end,
+        suffix,
+        zeroPad,
+      }),
+      frameRate,
+      yoyo,
+      repeat,
+    });
   }
 
   animateEyes() {
