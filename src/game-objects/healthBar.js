@@ -58,38 +58,38 @@ export default class HealthBar extends GameObjects.Container {
     let healthWidth = this.healthWidth * (this.health / 100);
 
     if (this.health === 0) {
-      this.healthBarLeftEdge.displayWidth = 0; //* L
-      this.healthBarRightEdge.displayWidth = 0; //* R
-      this.healthBarMeter.displayWidth = 0; //* C
+      this.healthBarLeftEdge.displayWidth = 0;
+      this.healthBarRightEdge.displayWidth = 0;
+      this.healthBarMeter.displayWidth = 0;
     }
 
     else if (healthWidth <= this.healthBarLeftEdge.width) {
-      this.healthBarLeftEdge.displayWidth = healthWidth; //* L
+      this.healthBarLeftEdge.displayWidth = healthWidth;
 
-      this.healthBarMeter.displayWidth = 0; //* C
+      this.healthBarMeter.displayWidth = 0;
 
-      this.healthBarRightEdge.displayWidth = 0; //* R
+      this.healthBarRightEdge.displayWidth = 0;
       
     }
     else if (healthWidth <= this.healthBarLeftEdge.width + this.healthBarMeter.width * 10) {
-      this.healthBarLeftEdge.displayWidth = this.healthBarLeftEdge.width; //* L
+      this.healthBarLeftEdge.displayWidth = this.healthBarLeftEdge.width;
 
       healthWidth -= this.healthBarLeftEdge.width;
       
-      this.healthBarMeter.displayWidth = healthWidth; //* C
+      this.healthBarMeter.displayWidth = healthWidth;
       Phaser.Display.Align.To.RightTop(this.healthBarMeter, this.healthBarLeftEdge);
 
-      this.healthBarRightEdge.displayWidth = 0; //* R
+      this.healthBarRightEdge.displayWidth = 0;
     }
     else if (healthWidth <= this.healthWidth) {
-      this.healthBarLeftEdge.displayWidth = this.healthBarLeftEdge.width; //* L
+      this.healthBarLeftEdge.displayWidth = this.healthBarLeftEdge.width;
 
-      this.healthBarMeter.setDisplaySize(this.healthBarMeter.width * 10, this.healthBarMeter.height); //* C
+      this.healthBarMeter.setDisplaySize(this.healthBarMeter.width * 10, this.healthBarMeter.height);
       Phaser.Display.Align.To.RightTop(this.healthBarMeter, this.healthBarLeftEdge);
 
       healthWidth -= (this.healthBarLeftEdge.width + this.healthBarMeter.width);
 
-      this.healthBarRightEdge.displayWidth = healthWidth; //* R
+      this.healthBarRightEdge.displayWidth = healthWidth;
       Phaser.Display.Align.To.RightTop(this.healthBarRightEdge, this.healthBarMeterFrame);
       this.healthBarRightEdge.x -= healthWidth / 2;
     }
@@ -98,7 +98,7 @@ export default class HealthBar extends GameObjects.Container {
     this.health = 100;
     this.healthBarLeftEdge.displayWidth = 206;
     this.healthBarMeter.displayWidth = 220;
-    this.healthBarMeter.setDisplaySize(this.healthBarMeter.width * 10, this.healthBarMeter.height); //* C
+    this.healthBarMeter.setDisplaySize(this.healthBarMeter.width * 10, this.healthBarMeter.height);
     Phaser.Display.Align.To.RightTop(this.healthBarMeter, this.healthBarLeftEdge);
     this.healthBarMeter.setX(this.healthBarMeter.x + (this.healthBarMeter.width * 10) / 2 - this.healthBarMeter.width / 2);
     this.healthBarRightEdge.displayWidth = 206;

@@ -58,38 +58,38 @@ export default class EnergyBar extends GameObjects.Container {
     let energyWidth = this.energyWidth * (this.energy / 100);
 
     if (this.energy === 0) {
-      this.energyBarLeftEdge.displayWidth = 0; //* L
-      this.energyBarRightEdge.displayWidth = 0; //* R
-      this.energyBarMeter.displayWidth = 0; //* C
+      this.energyBarLeftEdge.displayWidth = 0;
+      this.energyBarRightEdge.displayWidth = 0;
+      this.energyBarMeter.displayWidth = 0;
     }
 
     else if (energyWidth <= this.energyBarLeftEdge.width) {
-      this.energyBarLeftEdge.displayWidth = energyWidth; //* L
+      this.energyBarLeftEdge.displayWidth = energyWidth;
 
-      this.energyBarMeter.displayWidth = 0; //* C
+      this.energyBarMeter.displayWidth = 0;
 
-      this.energyBarRightEdge.displayWidth = 0; //* R
+      this.energyBarRightEdge.displayWidth = 0;
       
     }
     else if (energyWidth <= this.energyBarLeftEdge.width + this.energyBarMeter.width * 10) {
-      this.energyBarLeftEdge.displayWidth = this.energyBarLeftEdge.width; //* L
+      this.energyBarLeftEdge.displayWidth = this.energyBarLeftEdge.width;
 
       energyWidth -= this.energyBarLeftEdge.width;
       
-      this.energyBarMeter.displayWidth = energyWidth; //* C
+      this.energyBarMeter.displayWidth = energyWidth;
       Phaser.Display.Align.To.RightTop(this.energyBarMeter, this.energyBarLeftEdge);
 
-      this.energyBarRightEdge.displayWidth = 0; //* R
+      this.energyBarRightEdge.displayWidth = 0;
     }
     else if (energyWidth <= this.energyWidth) {
-      this.energyBarLeftEdge.displayWidth = this.energyBarLeftEdge.width; //* L
+      this.energyBarLeftEdge.displayWidth = this.energyBarLeftEdge.width;
 
-      this.energyBarMeter.setDisplaySize(this.energyBarMeter.width * 10, this.energyBarMeter.height); //* C
+      this.energyBarMeter.setDisplaySize(this.energyBarMeter.width * 10, this.energyBarMeter.height);
       Phaser.Display.Align.To.RightTop(this.energyBarMeter, this.energyBarLeftEdge);
 
       energyWidth -= (this.energyBarLeftEdge.width + this.energyBarMeter.width);
 
-      this.energyBarRightEdge.displayWidth = energyWidth; //* R
+      this.energyBarRightEdge.displayWidth = energyWidth;
       Phaser.Display.Align.To.RightTop(this.energyBarRightEdge, this.energyBarMeterFrame);
       this.energyBarRightEdge.x -= energyWidth / 2;
     }
@@ -98,7 +98,7 @@ export default class EnergyBar extends GameObjects.Container {
     this.energy = 100;
     this.energyBarLeftEdge.displayWidth = 206;
     this.energyBarMeter.displayWidth = 220;
-    this.energyBarMeter.setDisplaySize(this.energyBarMeter.width * 10, this.energyBarMeter.height); //* C
+    this.energyBarMeter.setDisplaySize(this.energyBarMeter.width * 10, this.energyBarMeter.height);
     Phaser.Display.Align.To.RightTop(this.energyBarMeter, this.energyBarLeftEdge);
     this.energyBarMeter.setX(this.energyBarMeter.x + (this.energyBarMeter.width * 10) / 2 - this.energyBarMeter.width / 2);
     this.energyBarRightEdge.displayWidth = 206;
