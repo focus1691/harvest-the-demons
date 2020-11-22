@@ -168,7 +168,7 @@ export default class Player {
     if (index > 8) {
       for (let i = 0; i < this.scene.meleeContactList.length; i++) {
         let key = this.scene.meleeContactList[i];
-        if (this.scene.enemies[key]) {
+        if (this.scene.enemies[key] && this.scene.enemies[key].isAlive) {
           let isBigEye = this.scene.enemies[key].bigEye;
           this.scene.killEnemy({
             key,

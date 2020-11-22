@@ -388,7 +388,7 @@ class playGame extends Phaser.Scene {
   }
 
   update(time, delta) {
-    if (this.remainingTargets === 0 && !this.gameOver) {
+    if (this.remainingTargets <= 0 && !this.gameOver) {
       this.gameOver = true;
       this.endLevel();
     }
