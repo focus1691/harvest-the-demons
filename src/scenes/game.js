@@ -288,8 +288,10 @@ class playGame extends Phaser.Scene {
     this.events.on(
       'wake',
       function () {
-        this.initEnemies();
-        this.gameOver = false;
+        if (this.gameOver) {
+          this.initEnemies();
+          this.gameOver = false;
+        }
       },
       this
     );
@@ -305,10 +307,6 @@ class playGame extends Phaser.Scene {
 
     this.circle = new Phaser.Geom.Circle(circleX, circleY, circleR);
     this.targetLine = new Phaser.Geom.Line(circleX, circleY, circleX, circleY);
-
-    // var graphics = this.add.graphics({ fillStyle: { color: 0xff0000 } });
-    // graphics.fillCircleShape(this.circle);
-    // graphics.setAlpha(0.1);
 
     //* Portal
     this.portal = new Portal({ scene: this, x: 0, y: 0, key: 'portal'});
