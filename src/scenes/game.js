@@ -448,7 +448,7 @@ class playGame extends Phaser.Scene {
         if (meleeKill) {
           this.enemies[key].play('blood_splatter');
         } else {
-          this.time.addEvent({ delay: 1000, callback: function() {
+          this.time.addEvent({ delay: 500, callback: function() {
             if (this.enemies[key]) {
               this.enemies[key].play('blood_splatter');
             }
