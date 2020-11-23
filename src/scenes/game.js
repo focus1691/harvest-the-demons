@@ -87,27 +87,6 @@ class playGame extends Phaser.Scene {
     this.best = localStorage.getItem('best_score') ? parseInt(localStorage.getItem('best_score'), 10) : 0;
     this.levels = [
       {
-        targets: 5,
-        bigTargets: 0,
-        minDelay: 1000,
-        maxDelay: 2000,
-        duration: 4000,
-      },
-      {
-        targets: 20,
-        bigTargets: 3,
-        minDelay: 1000,
-        maxDelay: 2000,
-        duration: 4000,
-      },
-      {
-        targets: 0,
-        bigTargets: 10,
-        minDelay: 2000,
-        maxDelay: 3000,
-        duration: 4000,
-      },
-      {
         targets: 20,
         bigTargets: 3,
         minDelay: 500,
