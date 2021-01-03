@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import playGame from './scenes/game';
 import './css/style.css';
+import preloaderScene from './scenes/preloader';
 import titleScene from './scenes/title';
 import scoreScene from './scenes/score';
 import gameOverScene from './scenes/gameOver';
@@ -29,7 +30,7 @@ const config = {
     mode: Phaser.DOM.FIT,
     autoCenter: Phaser.DOM.CENTER_BOTH,
   },
-  scene: [titleScene, playGame, scoreScene, gameOverScene],
+  scene: [preloaderScene, titleScene, playGame, scoreScene, gameOverScene],
   plugins: {
     scene: [
       {

@@ -1,6 +1,4 @@
 import Phaser from 'phaser';
-// Images
-import backgroundImg from '../assets/images/2_game_background.png';
 import constants from '../assets/configs/constants';
 import { alignGrid } from '../assets/configs/alignGrid';
 import { assetsDPR } from '../index';
@@ -8,11 +6,9 @@ export default class GameOverScene extends Phaser.Scene {
   constructor() {
     super('scoreScene');
   }
-  preload() {
-    this.load.image('background', backgroundImg);
-    alignGrid.create({ scene: this, rows: 10, columns: 10 });
-  }
   create() {
+    alignGrid.create({ scene: this, rows: 10, columns: 10 });
+
     this.make.image({
       key: 'background',
       x: 0,
