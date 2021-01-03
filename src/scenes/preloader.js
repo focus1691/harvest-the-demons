@@ -64,11 +64,21 @@ export default class preloaderScene extends Phaser.Scene {
     super('preloaderScene');
   }
   preload() {
+		this.graphics = this.add.graphics();
 		this.newGraphics = this.add.graphics();
-		this.newGraphics.fillStyle(0x3587e2, 1);
-    this.newGraphics.fillRectShape(new Phaser.Geom.Rectangle(205, 205, 290, 40));
+		var progressBar = new Phaser.Geom.Rectangle(0, 0, 400, 50);
+		var progressBarFill = new Phaser.Geom.Rectangle(0, 0, 290, 40);
 
-		this.loadingText = this.add.text(250,260,"Loading: ", { fontSize: '32px', fill: '#FFF' });
+		this.graphics.fillStyle(0xffffff, 1);
+		this.graphics.fillRectShape(progressBar);
+
+		this.newGraphics.fillStyle(0x3587e2, 1);
+		this.newGraphics.fillRectShape(progressBarFill);
+
+    this.loadingText = this.add.text(0, 0, "Loading: ", { fontSize: '32px', fill: '#FFF' });
+      this.loadingText.setPosition(this.game.config.width / 2, this.game.config.height / 2);
+
+      Phaser.Display.Align.In.Center(this.loadingText, this.add.zone(this.game.config.width / 2, this.game.config.height / 2, this.game.config.width, this.game.config.height));
 
     this.load.image('background', backgroundImg);
     this.load.image('sound_on', soundOnImg);
@@ -122,7 +132,7 @@ export default class preloaderScene extends Phaser.Scene {
   updateBar(percentage) {
     this.newGraphics.clear();
     this.newGraphics.fillStyle(0x3587e2, 1);
-    this.newGraphics.fillRectShape(new Phaser.Geom.Rectangle(205, 205, percentage * 390, 40));
+    // this.newGraphics.fillRectShape(new Phaser.Geom.Rectangle(205, 205, percentage * 390, 40));
 
     percentage = percentage * 100;
     this.loadingText.setText('Loading: ' + percentage.toFixed(2) + '%');
