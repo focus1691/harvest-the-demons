@@ -1,0 +1,335 @@
+{
+	"textures": [
+		{
+			"image": "portal.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 3954,
+				"h": 4045
+			},
+			"scale": 1,
+			"frames": [
+				{
+					"filename": "__red_hell_portal_horns_lava_0.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_1.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 1319,
+						"y": 1,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_2.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 2637,
+						"y": 1,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_3.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 1,
+						"y": 810,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_4.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 1319,
+						"y": 810,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_5.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 2637,
+						"y": 810,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_6.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 1,
+						"y": 1619,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_7.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 1,
+						"y": 2428,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_8.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 1,
+						"y": 3237,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_9.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 1319,
+						"y": 1619,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_10.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 2637,
+						"y": 1619,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_11.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 1319,
+						"y": 2428,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_12.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 1319,
+						"y": 3237,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_13.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 2637,
+						"y": 2428,
+						"w": 1316,
+						"h": 807
+					}
+				},
+				{
+					"filename": "__red_hell_portal_horns_lava_14.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1316,
+						"h": 807
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1316,
+						"h": 807
+					},
+					"frame": {
+						"x": 2637,
+						"y": 3237,
+						"w": 1316,
+						"h": 807
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:5638d66a0bc7a089ff121739f6174097:0d0c8eed186744ed8fc8d42b8857ca70:3b79c46182e6baa2a6b599ce58bd77b1$"
+	}
+}

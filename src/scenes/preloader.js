@@ -28,6 +28,10 @@ import redMonsterJSON from '../assets/spritesheets/red_monster.json';
 
 import yellowMonsterSpriteSheet from '../assets/spritesheets/yellow_monster.png';
 import yellowMonsterJSON from '../assets/spritesheets/yellow_monster.json';
+
+import portalLavaSpriteSheet from '../assets/spritesheets/portal.png';
+import portalLavaJSON from '../assets/spritesheets/portal.json';
+
 //* mp3
 import demonLordAudio from '../assets/sound/demon_lord.mp3';
 import axeSwingSound from '../assets/sound/zapsplat_warfare_weapon_axe_large_object_swing_swoosh_002.mp3';
@@ -124,6 +128,8 @@ export default class preloaderScene extends Phaser.Scene {
     this.load.atlas('red_monster', redMonsterSpriteSheet, redMonsterJSON);
     this.load.atlas('yellow_monster', yellowMonsterSpriteSheet, yellowMonsterJSON);
     this.load.atlas('grey_monster', greyMonsterSpriteSheet, greyMonsterJSON);
+
+    this.load.atlas('portal_lava', portalLavaSpriteSheet, portalLavaJSON);
 
     this.load.audio('demon_theme', demonLordAudio);
     this.load.audio('axe_swing', axeSwingSound);

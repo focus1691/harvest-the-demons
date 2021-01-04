@@ -154,6 +154,8 @@ class playGame extends Phaser.Scene {
 
     this.createAnimation('blood_splatter', 'blood', 'blood', 0, 29, '.png', false, 0, 75, 0);
 
+    this.createAnimation('portal_lava_fall', 'portal_lava', '__red_hell_portal_horns_lava_', 0, 14, '.png', true, -1, 15);
+
     this.make.image({
       key: 'background',
       x: 0,
@@ -189,6 +191,7 @@ class playGame extends Phaser.Scene {
     //* Portal
     this.portal = new Portal({ scene: this, x: 0, y: 0, key: 'portal'});
     this.portal.setPosition(this.targetLine.x1, this.targetLine.y1);
+    this.portal.play('portal_lava_fall');
 
     //* Ghost Warrior
     var shapes = this.cache.json.get('ghost_warrior_shapes');
