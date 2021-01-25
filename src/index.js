@@ -7,6 +7,7 @@ import scoreScene from './scenes/score';
 import gameOverScene from './scenes/gameOver';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 import { alignGrid } from './assets/configs/alignGrid';
+import tutorialScene from './scenes/tutorial';
 
 const roundHalf = (num) => Math.round(num * 2) / 2;
 const DPR = window.devicePixelRatio;
@@ -30,7 +31,7 @@ const config = {
     mode: Phaser.DOM.FIT,
     autoCenter: Phaser.DOM.CENTER_BOTH,
   },
-  scene: [preloaderScene, titleScene, playGame, scoreScene, gameOverScene],
+  scene: [preloaderScene, titleScene, playGame, scoreScene, gameOverScene, tutorialScene],
   plugins: {
     scene: [
       {

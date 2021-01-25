@@ -62,6 +62,8 @@ import healthBarRightEdge from '../assets/images/healthbar/red/meter_bar_right_e
 import healthBarRightFrame from '../assets/images/healthbar/red/meter_bar_holder_right_edge_red.png';
 import healthMeterBadge from '../assets/images/healthbar/red/meter_icon_holder_red.png';
 import healthMeterIcon from '../assets/images/healthbar/icons/health.png';
+import tutorial from '../assets/video/tutorial.mp4';
+import tutorial_2 from '../assets/video/tutorial_2.mp4';
 
 export default class preloaderScene extends Phaser.Scene {
   constructor() {
@@ -138,6 +140,9 @@ export default class preloaderScene extends Phaser.Scene {
     this.load.audio('player_damaged', playerHitSound);
     this.load.audio('portal_damaged', portalHitSound);
     this.load.audio('disturbing_piano_string', scaryMusic);
+
+    this.load.video('tutorial', tutorial);
+    this.load.video('tutorial_2', tutorial_2);
 
     this.load.on('progress', this.updateBar, this);
     this.load.on('complete', this.complete, this);

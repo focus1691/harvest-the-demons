@@ -6,6 +6,7 @@ export default class GameOverScene extends Phaser.Scene {
   constructor() {
     super('scoreScene');
   }
+
   create() {
     alignGrid.create({ scene: this, rows: 10, columns: 10 });
 

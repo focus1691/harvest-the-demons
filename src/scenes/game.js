@@ -10,6 +10,9 @@ import { Between } from 'phaser/src/math/';
 import { v4 as uuidv4 } from 'uuid';
 import { assetsDPR } from '..';
 import { alignGrid } from '../assets/configs/alignGrid';
+
+import { gameState } from "../state/gameState";
+
 const colours = ['black', 'blue', 'green', 'grey', 'red', 'yellow'];
 
 class playGame extends Phaser.Scene {
@@ -21,6 +24,8 @@ class playGame extends Phaser.Scene {
       x: 0,
       y: 0,
     };
+    this.meleeKills = 0;
+    this.axeKills = 0;
     this.accumMS = 0;
     this.hzMS = (1 / 60) * 1000;
     this.afk = false;
@@ -93,6 +98,7 @@ class playGame extends Phaser.Scene {
             isPlayerHit: false,
             meleeKill: false,
           });
+          this.axeKills++;
           this.onEnemyKilled(isBigEye);
         }
       } else if ((a === 'body' || b === 'body') && (this.enemies[a] || this.enemies[b])) {
@@ -121,6 +127,7 @@ class playGame extends Phaser.Scene {
               isPlayerHit: false,
               meleeKill: true,
             });
+            this.meleeKills++;
             this.onEnemyKilled(isBigEye);
           } else if (!this.meleeContactList.includes(enemyKey)) {
             this.meleeContactList.push(enemyKey);
@@ -164,6 +171,17 @@ class playGame extends Phaser.Scene {
       origin: { x: 0, y: 0 },
       scale: { x: 1.5, y: 1.5 },
     });
+
+
+    if (this.showAxeTutorial() || this.showMeleeTutorial()) {
+      // The camera fade causes the screen to go black because of the pause below
+      // There may be a way to trigger the below logic AFTER the camera has finished fading
+      //this.cameras.main.fadeIn(500);
+
+      this.scene.launch('tutorialScene');
+      this.scene.bringToTop("tutorialScene");
+      this.scene.pause("playGame");  
+    }
 
     this.events.on(
       'wake',
@@ -264,8 +282,6 @@ class playGame extends Phaser.Scene {
     );
 
     this.initEnemies();
-
-    this.cameras.main.fadeIn(500);
   }
 
   update(time, delta) {
@@ -303,13 +319,15 @@ class playGame extends Phaser.Scene {
       this.best = this.score;
     }
 
+    this.updateKillCounter();
+
     this.removeEnemies();
     this.healthBar.restore();
     this.energyBar.restore();
     this.sound.stopByKey('disturbing_piano_string');
     this.time.addEvent({ delay: 2000, callback: this.chooseNextLevel, callbackScope: this, repeat: 0 });
   }
-  
+
   chooseNextLevel() {
     if (this.level < this.levels.length - 1) {
       this.scene.sleep('playGame');
@@ -516,7 +534,8 @@ class playGame extends Phaser.Scene {
   checkGameOver() {
     if (this.healthBar.health <= 0) {
       this.healthBar.restore();
-      return this.scene.start('gameOverScene', { score: this.score, best: this.best });
+      this.updateKillCounter();
+      return this.scene.start('gameOverScene', { score: this.score, best: this.best});
     }
   }
 
@@ -525,11 +544,35 @@ class playGame extends Phaser.Scene {
     return false;
   }
 
+  // Update current game state
+  // Update future game state (local storage)
+  updateKillCounter() {
+    let totalMeleeKills = this.meleeKills + gameState._totalMeleeKills;
+    let totalAxeKills = this.axeKills + gameState._totalMeleeKills;
+    
+    gameState.commit('totalMeleeKills', totalMeleeKills);
+    gameState.commit('totalAxeKills', totalAxeKills);
+
+    if (totalAxeKills > gameState._checkForTutorial)
+      localStorage.setItem('axe_tutorial_shown', true)
+    
+    if (totalMeleeKills > gameState._checkForTutorial)    
+      localStorage.setItem('melee_tutorial_shown', true);
+  }
+
   distanceTo(source, target) {
     let dx = source.x - target.x;
     let dy = source.y - target.y;
 
     return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  showAxeTutorial() {
+    return gameState._totalAxeKills < gameState._checkForTutorial && !gameState._axeTutorialDismissed;
+  }
+
+  showMeleeTutorial() {
+    return gameState._totalMeleeKills < gameState._checkForTutorial && !gameState._meleeTutorialDismissed;
   }
 }
 
