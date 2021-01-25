@@ -121,5 +121,11 @@ export default class TutorialScene extends Phaser.Scene {
     this.scene.start('playGame');
   }
 
-  update() {}
+  update() {
+    if (this.axeTutorialDialog.visible && !this.axeTutorialVideo.isPlaying())
+      this.axeTutorialVideo.play();
+    
+    if (this.meleeTutorialDialog.visible && !this.meleeTutorialVideo.isPlaying())
+      this.meleeTutorialVideo.play();
+  }
 }
