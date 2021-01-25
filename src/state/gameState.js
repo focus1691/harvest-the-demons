@@ -5,13 +5,14 @@
 class GameState {
   constructor() {
     this.lastTransaction = null;
-    this._checkForTutorial = 3;
-    this._totalMeleeKills = 0;
-    this._totalAxeKills = 0;
-    this._axeTutorialDismissed =
-      localStorage.getItem("axe_tutorial_shown") === "true";
-    this._meleeTutorialDismissed =
-      localStorage.getItem("melee_tutorial_shown") === "true";
+    this.checkForTutorial = 3;
+    this.totalMeleeKills = 0;
+    this.totalAxeKills = 0;
+    this.axeTutorialDismissed =
+      localStorage.getItem('axe_tutorial_shown') === 'true';
+      
+    this.meleeTutorialDismissed =
+      localStorage.getItem('melee_tutorial_shown') === 'true';
   }
 
   /**
@@ -21,21 +22,21 @@ class GameState {
    */
   commit(key, value) {
     if (this.containsKey(key)) {
-        this.lastTransaction = {
-            key: key,
-            value: this[`_${key}`]
-        }
+      this.lastTransaction = {
+        key: key,
+        value: this[`${key}`],
+      };
 
-        this[`_${key}`] = value;
+      this[`${key}`] = value;
     }
   }
 
   /**
-   * 
+   *
    * @param {string} key Checks for the existance of a object key
    */
   containsKey(key) {
-      return this[`_${key}`] !== undefined;
+    return this[`${key}`] !== undefined;
   }
 
   /**
@@ -43,12 +44,12 @@ class GameState {
    */
   revertLastTransaction() {
     if (this.lastTransaction) {
-        const key = this.lastTransaction.key;
-        const value = this.lastTransaction.value;
+      const key = this.lastTransaction.key;
+      const value = this.lastTransaction.value;
 
-        this[`_${key}`] = value;
+      this[`${key}`] = value;
 
-        this.lastTransaction = null;
+      this.lastTransaction = null;
     }
   }
 }

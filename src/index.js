@@ -31,7 +31,7 @@ const config = {
     mode: Phaser.DOM.FIT,
     autoCenter: Phaser.DOM.CENTER_BOTH,
   },
-  scene: [preloaderScene, titleScene, playGame, scoreScene, gameOverScene, tutorialScene],
+  scene: [preloaderScene, titleScene, tutorialScene, playGame, scoreScene, gameOverScene],
   plugins: {
     scene: [
       {

@@ -1,4 +1,4 @@
-import { assetsDPR } from "..";
+import { assetsDPR } from '..';
 
 /**
  * Utility class that returns UI game objects
@@ -9,13 +9,13 @@ export default class Tutorial {
   constructor() {}
 
   /**
-   * 
-   * @param {*} scene 
-   * @param {*} tutorialVideo 
+   *
+   * @param {*} scene
+   * @param {*} tutorialVideo
    */
   static createAxeTutorial(scene, tutorialVideo) {
     const container = scene.rexUI.add.sizer({
-      orientation: "y",
+      orientation: 'y',
       expand: false,
       space: { item: 20, left: 20, right: 20, top: 20, bottom: 20 },
       width: 150,
@@ -23,28 +23,28 @@ export default class Tutorial {
     });
 
     const tutorialText = scene.add
-      .text(0, 0, "Defeat small monsters by using the tip of the axe!", {
+      .text(0, 0, 'Defeat small monsters by using the tip of the axe!', {
         fontSize: `${10 * assetsDPR}px`,
         strokeThickness: 3,
       })
       .setDepth(205);
 
     const next = scene.add
-      .text(0, 0, "Got it", {
+      .text(0, 0, 'Got it', {
         fontSize: `${8 * assetsDPR}px`,
         strokeThickness: 3,
       })
       .setInteractive()
-      .on("pointerover", function () {
-        this.setColor("#af111c");
-        this.setStroke("#af111c");
+      .on('pointerover', function () {
+        this.setColor('#af111c');
+        this.setStroke('#af111c');
       })
-      .on("pointerout", function () {
-        this.setColor("white");
-        this.setStroke("white");
+      .on('pointerout', function () {
+        this.setColor('white');
+        this.setStroke('white');
       })
       .on(
-        "pointerup",
+        'pointerup',
         function () {
           scene.setMeleeTutorialVisible();
         },
@@ -58,16 +58,16 @@ export default class Tutorial {
         strokeThickness: 3,
       })
       .setInteractive()
-      .on("pointerover", function () {
-        this.setColor("#af111c");
-        this.setStroke("#af111c");
+      .on('pointerover', function () {
+        this.setColor('#af111c');
+        this.setStroke('#af111c');
       })
-      .on("pointerout", function () {
-        this.setColor("white");
-        this.setStroke("white");
+      .on('pointerout', function () {
+        this.setColor('white');
+        this.setStroke('white');
       })
       .on(
-        "pointerup",
+        'pointerup',
         function () {
           scene.dismissAxeTutorial();
         },
@@ -81,7 +81,7 @@ export default class Tutorial {
       .dialog({
         background: scene.rexUI.add
           .roundRectangle(0, 0, 150, 150, 8, 0x2b2d2f, 1)
-          .setStrokeStyle(2, "0x000000"),
+          .setStrokeStyle(2, '0x000000'),
         space: {
           left: 20,
           right: 20,
@@ -92,7 +92,7 @@ export default class Tutorial {
         actions: [neverShowAgain, next],
         content: container,
         align: {
-          actions: "right",
+          actions: 'right',
         },
       })
       .layout();
@@ -100,7 +100,7 @@ export default class Tutorial {
 
   static createMeleeTutorial(scene, tutorialVideo) {
     const container = scene.rexUI.add.sizer({
-      orientation: "y",
+      orientation: 'y',
       expand: false,
       space: { item: 20, left: 20, right: 20, top: 20, bottom: 20 },
       width: 150,
@@ -108,7 +108,7 @@ export default class Tutorial {
     });
 
     const tutorialText = scene.add
-      .text(0, 0, "Destroy large monsters with a vicious melee attack!", {
+      .text(0, 0, 'Destroy large monsters with a vicious melee attack!', {
         fontSize: `${10 * assetsDPR}px`,
         strokeThickness: 3,
       })
@@ -120,16 +120,16 @@ export default class Tutorial {
         strokeThickness: 3,
       })
       .setInteractive()
-      .on("pointerover", function () {
-        this.setColor("#af111c");
-        this.setStroke("#af111c");
+      .on('pointerover', function () {
+        this.setColor('#af111c');
+        this.setStroke('#af111c');
       })
-      .on("pointerout", function () {
-        this.setColor("white");
-        this.setStroke("white");
+      .on('pointerout', function () {
+        this.setColor('white');
+        this.setStroke('white');
       })
       .on(
-        "pointerup",
+        'pointerup',
         function () {
           scene.dismissMeleeTutorial();
         },
@@ -138,21 +138,21 @@ export default class Tutorial {
       .setDepth(205);
 
     const next = scene.add
-      .text(0, 0, "Got it", {
+      .text(0, 0, 'Got it', {
         fontSize: `${8 * assetsDPR}px`,
         strokeThickness: 3,
       })
       .setInteractive()
-      .on("pointerover", function () {
-        this.setColor("#af111c");
-        this.setStroke("#af111c");
+      .on('pointerover', function () {
+        this.setColor('#af111c');
+        this.setStroke('#af111c');
       })
-      .on("pointerout", function () {
-        this.setColor("white");
-        this.setStroke("white");
+      .on('pointerout', function () {
+        this.setColor('white');
+        this.setStroke('white');
       })
       .on(
-        "pointerup",
+        'pointerup',
         function () {
           scene.setAxeTutorialVisible();
         },
@@ -166,7 +166,7 @@ export default class Tutorial {
       .dialog({
         background: scene.rexUI.add
           .roundRectangle(0, 0, 150, 150, 8, 0x2b2d2f, 1)
-          .setStrokeStyle(2, "0x000000"),
+          .setStrokeStyle(2, '0x000000'),
         space: {
           left: 20,
           right: 20,
@@ -177,7 +177,7 @@ export default class Tutorial {
         actions: [neverShowAgain, next],
         content: container,
         align: {
-          actions: "right",
+          actions: 'right',
         },
       })
       .layout();

@@ -172,17 +172,6 @@ class playGame extends Phaser.Scene {
       scale: { x: 1.5, y: 1.5 },
     });
 
-
-    if (this.showAxeTutorial() || this.showMeleeTutorial()) {
-      // The camera fade causes the screen to go black because of the pause below
-      // There may be a way to trigger the below logic AFTER the camera has finished fading
-      //this.cameras.main.fadeIn(500);
-
-      this.scene.launch('tutorialScene');
-      this.scene.bringToTop("tutorialScene");
-      this.scene.pause("playGame");  
-    }
-
     this.events.on(
       'wake',
       function () {
@@ -280,6 +269,8 @@ class playGame extends Phaser.Scene {
       },
       this
     );
+  
+    this.cameras.main.fadeIn(500);
 
     this.initEnemies();
   }
@@ -547,16 +538,16 @@ class playGame extends Phaser.Scene {
   // Update current game state
   // Update future game state (local storage)
   updateKillCounter() {
-    let totalMeleeKills = this.meleeKills + gameState._totalMeleeKills;
-    let totalAxeKills = this.axeKills + gameState._totalMeleeKills;
+    let totalMeleeKills = this.meleeKills + gameState.totalMeleeKills;
+    let totalAxeKills = this.axeKills + gameState.totalMeleeKills;
     
     gameState.commit('totalMeleeKills', totalMeleeKills);
     gameState.commit('totalAxeKills', totalAxeKills);
 
-    if (totalAxeKills > gameState._checkForTutorial)
+    if (totalAxeKills > gameState.checkForTutorial)
       localStorage.setItem('axe_tutorial_shown', true)
     
-    if (totalMeleeKills > gameState._checkForTutorial)    
+    if (totalMeleeKills > gameState.checkForTutorial)    
       localStorage.setItem('melee_tutorial_shown', true);
   }
 
@@ -568,11 +559,11 @@ class playGame extends Phaser.Scene {
   }
 
   showAxeTutorial() {
-    return gameState._totalAxeKills < gameState._checkForTutorial && !gameState._axeTutorialDismissed;
+    return gameState.totalAxeKills < gameState.checkForTutorial && !gameState.axeTutorialDismissed;
   }
 
   showMeleeTutorial() {
-    return gameState._totalMeleeKills < gameState._checkForTutorial && !gameState._meleeTutorialDismissed;
+    return gameState._totalMeleeKills < gameState.checkForTutorial && !gameState.meleeTutorialDismissed;
   }
 }
 

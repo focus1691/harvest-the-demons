@@ -49,7 +49,7 @@ export default class TitleScene extends Phaser.Scene {
       .on(
         'pointerup',
         function () {
-          this.scene.start('playGame');
+          this.scene.start('tutorialScene');
         },
         this
       );
