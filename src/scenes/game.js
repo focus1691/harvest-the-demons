@@ -394,11 +394,17 @@ class playGame extends Phaser.Scene {
     var delay = 0;
     // Destructure Level props
     const { minDelay, maxDelay, duration, smallTargets, bigTargets } = this.levels[this.level];
+    let position = Between(1, 4);
+    let prevPosition = null;
 
     // Setup all the enemies for this level
     if (smallTargets === 0) {
       for (let i = 0; i < bigTargets; i++) {
-        delay = this.createEnemy(delay, minDelay, maxDelay, duration, true);
+        while (position === prevPosition) {
+          position = Between(1, 4);
+        }
+        delay = this.createEnemy(delay, minDelay, maxDelay, duration, true, position);
+        prevPosition = position;
       }
     } else {
       const bigEyeTime = [];
@@ -412,17 +418,25 @@ class playGame extends Phaser.Scene {
       for (let i = 0; i < smallTargets; ) {
         if (bigEyeTime.length > 0 && bigEyeTime[0] === i) {
           bigEyeTime.splice(0, 1);
-          delay = this.createEnemy(delay, minDelay, maxDelay, duration, true);
+          while (position === prevPosition) {
+            position = Between(1, 4);
+          }
+          delay = this.createEnemy(delay, minDelay, maxDelay, duration, true, position);
+          prevPosition = position;
         } else {
-          delay = this.createEnemy(delay, minDelay, maxDelay, duration, false);
+          while (position === prevPosition) {
+            position = Between(1, 4);
+          }
+          delay = this.createEnemy(delay, minDelay, maxDelay, duration, false, position);
+          prevPosition = position;
           i++;
         }
       }
     }
   }
 
-  createEnemy(delay, min, max, duration, bigEye) {
-    const { x, y } = this.getEnemyPosition(Between(1, 4));
+  createEnemy(delay, min, max, duration, bigEye, position) {
+    const { x, y } = this.getEnemyPosition(position);
     const key = uuidv4();
     const colour = colours[Math.floor(Math.random() * 6 - 0)]; // random colour
     this.enemies[key] = new FlyingMonster({
@@ -439,7 +453,7 @@ class playGame extends Phaser.Scene {
     delay += Between(min, max);
 
     this.enemies[key].tween = this.tweens.add({
-      smallTargets: this.enemies[key],
+      targets: this.enemies[key],
       visible: {
         from: true,
       },
