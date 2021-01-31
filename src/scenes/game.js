@@ -531,11 +531,6 @@ class playGame extends Phaser.Scene {
     }
   }
 
-  isEnemyNear(source, target) {
-    if (this.distanceTo(source, target) < 200) return true;
-    return false;
-  }
-
   // Update current game state
   // Update future game state (local storage)
   updateKillCounter() {
