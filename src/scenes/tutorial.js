@@ -50,7 +50,7 @@ export default class TutorialScene extends Phaser.Scene {
       else if (this.showMeleeTutorial()) this.setMeleeTutorialVisible();
     } else {
       this.scene.stop('tutorialScene');
-      this.scene.play('playGame');
+      this.scene.start('playGame');
     }
   }
 

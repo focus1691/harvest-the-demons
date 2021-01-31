@@ -470,6 +470,7 @@ class playGame extends Phaser.Scene {
         });
         this.lives -= 1;
         this.sound.play('portal_damaged');
+        this.scene.start('gameOverScene', { score: this.score, best: this.best});
       }.bind(this),
     });
     return delay;
