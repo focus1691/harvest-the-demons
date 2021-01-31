@@ -36,28 +36,28 @@ class playGame extends Phaser.Scene {
     this.best = localStorage.getItem('best_score') ? parseInt(localStorage.getItem('best_score'), 10) : 0;
     this.levels = [
       {
-        targets: 20,
+        smallTargets: 20,
         bigTargets: 3,
         minDelay: 500,
         maxDelay: 1500,
         duration: 3000,
       },
       {
-        targets: 0,
+        smallTargets: 0,
         bigTargets: 5,
         minDelay: 500,
         maxDelay: 1500,
         duration: 3000,
       },
       {
-        targets: 20,
+        smallTargets: 20,
         bigTargets: 3,
         minDelay: 500,
         maxDelay: 1000,
         duration: 2000,
       },
       {
-        targets: 30,
+        smallTargets: 30,
         bigTargets: 0,
         minDelay: 500,
         maxDelay: 1000,
@@ -65,7 +65,7 @@ class playGame extends Phaser.Scene {
       },
     ];
     this.enemies = {};
-    this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTargets;
+    this.remainingTargets = this.levels[this.level].smallTargets + this.levels[this.level].bigTargets;
     this.hitList = [];
     this.meleeContactList = [];
   }
@@ -323,7 +323,7 @@ class playGame extends Phaser.Scene {
     if (this.level < this.levels.length - 1) {
       this.scene.sleep('playGame');
       this.level += 1;
-      this.remainingTargets = this.levels[this.level].targets + this.levels[this.level].bigTargets;
+      this.remainingTargets = this.levels[this.level].smallTargets + this.levels[this.level].bigTargets;
       this.scene.launch('scoreScene');
     } else {
       this.scene.stop('playGame');
@@ -393,23 +393,23 @@ class playGame extends Phaser.Scene {
   initEnemies() {
     var delay = 0;
     // Destructure Level props
-    const { minDelay, maxDelay, duration, targets, bigTargets } = this.levels[this.level];
+    const { minDelay, maxDelay, duration, smallTargets, bigTargets } = this.levels[this.level];
 
     // Setup all the enemies for this level
-    if (targets === 0) {
+    if (smallTargets === 0) {
       for (let i = 0; i < bigTargets; i++) {
         delay = this.createEnemy(delay, minDelay, maxDelay, duration, true);
       }
     } else {
       const bigEyeTime = [];
       for (let i = 0; i < bigTargets; i++) {
-        bigEyeTime.push(Between(0, targets - 1));
+        bigEyeTime.push(Between(0, smallTargets - 1));
       }
       bigEyeTime.sort(function (a, b) {
         return a - b;
       });
 
-      for (let i = 0; i < targets; ) {
+      for (let i = 0; i < smallTargets; ) {
         if (bigEyeTime.length > 0 && bigEyeTime[0] === i) {
           bigEyeTime.splice(0, 1);
           delay = this.createEnemy(delay, minDelay, maxDelay, duration, true);
@@ -439,7 +439,7 @@ class playGame extends Phaser.Scene {
     delay += Between(min, max);
 
     this.enemies[key].tween = this.tweens.add({
-      targets: this.enemies[key],
+      smallTargets: this.enemies[key],
       visible: {
         from: true,
       },
