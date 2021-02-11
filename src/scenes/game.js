@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { assetsDPR } from '..';
 import { alignGrid } from '../assets/configs/alignGrid';
 
-import { gameState } from "../state/gameState";
+import { gameState } from '../state/gameState';
 
 const colours = ['black', 'blue', 'green', 'grey', 'red', 'yellow'];
 
@@ -79,8 +79,8 @@ class playGame extends Phaser.Scene {
     this.scaleFactor = 30;
 
     // Planck event bindings
-    this.world.on('pre-solve', (contact, oldManifold) => { });
-    this.world.on('post-solve', (contact, oldManifold) => { });
+    this.world.on('pre-solve', (contact, oldManifold) => {});
+    this.world.on('post-solve', (contact, oldManifold) => {});
 
     this.world.on('begin-contact', (contact, oldManifold) => {
       const a = contact.getFixtureA().getUserData();
@@ -196,7 +196,7 @@ class playGame extends Phaser.Scene {
     this.targetLine = new Phaser.Geom.Line(circleX, circleY, circleX, circleY);
 
     //* Portal
-    this.portal = new Portal({ scene: this, x: 0, y: 0, key: 'portal'});
+    this.portal = new Portal({ scene: this, x: 0, y: 0, key: 'portal' });
     this.portal.setPosition(this.targetLine.x1, this.targetLine.y1);
     this.portal.play('portal_lava_fall');
 
@@ -269,7 +269,7 @@ class playGame extends Phaser.Scene {
       },
       this
     );
-  
+
     this.cameras.main.fadeIn(500);
 
     this.initEnemies();
@@ -288,14 +288,14 @@ class playGame extends Phaser.Scene {
           //  Project a line from the center of the circle to the pointer
           this.targetLine.x2 = this.input.activePointer.worldX;
           this.targetLine.y2 = this.input.activePointer.worldY;
-  
+
           this.player.update(this.targetLine);
-  
+
           // this.player.left.drawDebug();
           // this.player.right.drawDebug();
         }
       }
-  
+
       while (this.accumMS >= this.hzMS) {
         this.accumMS -= this.hzMS;
         this.world.step(1 / 30);
@@ -345,7 +345,7 @@ class playGame extends Phaser.Scene {
     this.scoreText.setText(`${this.score}`);
   }
 
-  killEnemy({key, isPlayerHit, meleeKill}) {
+  killEnemy({ key, isPlayerHit, meleeKill }) {
     if (this.enemies[key]) {
       this.enemies[key].isAlive = false;
       if (this.enemies[key].tween) {
@@ -359,11 +359,16 @@ class playGame extends Phaser.Scene {
         if (meleeKill) {
           this.enemies[key].play('blood_splatter');
         } else {
-          this.time.addEvent({ delay: 500, callback: function() {
-            if (this.enemies[key]) {
-              this.enemies[key].play('blood_splatter');
-            }
-          }, callbackScope: this, repeat: 0 });
+          this.time.addEvent({
+            delay: 500,
+            callback: function () {
+              if (this.enemies[key]) {
+                this.enemies[key].play('blood_splatter');
+              }
+            },
+            callbackScope: this,
+            repeat: 0,
+          });
         }
       } else {
         this.removeEnemy(key);
@@ -484,7 +489,7 @@ class playGame extends Phaser.Scene {
         });
         this.lives -= 1;
         this.sound.play('portal_damaged');
-        this.scene.start('gameOverScene', { score: this.score, best: this.best});
+        this.scene.start('gameOverScene', { score: this.score, best: this.best });
       }.bind(this),
     });
     return delay;
@@ -541,7 +546,7 @@ class playGame extends Phaser.Scene {
     if (this.healthBar.health <= 0) {
       this.healthBar.restore();
       this.updateKillCounter();
-      return this.scene.start('gameOverScene', { score: this.score, best: this.best});
+      return this.scene.start('gameOverScene', { score: this.score, best: this.best });
     }
   }
 
@@ -550,15 +555,13 @@ class playGame extends Phaser.Scene {
   updateKillCounter() {
     let totalMeleeKills = this.meleeKills + gameState.totalMeleeKills;
     let totalAxeKills = this.axeKills + gameState.totalMeleeKills;
-    
+
     gameState.commit('totalMeleeKills', totalMeleeKills);
     gameState.commit('totalAxeKills', totalAxeKills);
 
-    if (totalAxeKills > gameState.checkForTutorial)
-      localStorage.setItem('axe_tutorial_shown', true)
-    
-    if (totalMeleeKills > gameState.checkForTutorial)    
-      localStorage.setItem('melee_tutorial_shown', true);
+    if (totalAxeKills > gameState.checkForTutorial) localStorage.setItem('axe_tutorial_shown', true);
+
+    if (totalMeleeKills > gameState.checkForTutorial) localStorage.setItem('melee_tutorial_shown', true);
   }
 
   distanceTo(source, target) {
