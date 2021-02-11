@@ -564,13 +564,6 @@ class playGame extends Phaser.Scene {
     if (totalMeleeKills > gameState.checkForTutorial) localStorage.setItem('melee_tutorial_shown', true);
   }
 
-  distanceTo(source, target) {
-    let dx = source.x - target.x;
-    let dy = source.y - target.y;
-
-    return Math.sqrt(dx * dx + dy * dy);
-  }
-
   showAxeTutorial() {
     return gameState.totalAxeKills < gameState.checkForTutorial && !gameState.axeTutorialDismissed;
   }
