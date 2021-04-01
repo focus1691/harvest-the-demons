@@ -11,6 +11,25 @@ import { v4 as uuidv4 } from 'uuid';
 import { assetsDPR } from '..';
 import { alignGrid } from '../assets/configs/alignGrid';
 
+//* Utils
+import { shuffle } from '../utils/math';
+
+//* Constants
+import {
+  FASTEST_ENEMY_MIN,
+  FASTEST_ENEMY_MAX,
+  FASTEST_ENEMY_SPEED,
+  SUPER_SONIC_MIN,
+  SUPER_SONIC_MAX,
+  SUPER_SONIC_SPEED,
+  SWARM_DELAY_MIN,
+  SWARM_DELAY_MAX,
+  SWARM_SPEED,
+  N_SUPER_SONIC,
+  N_ENEMIES_IN_ONE_LOCATION,
+  N_ENEMIES_SWARM,
+} from '../constants';
+
 import { gameState } from '../state/gameState';
 
 const colours = ['black', 'blue', 'green', 'grey', 'red', 'yellow'];
@@ -29,7 +48,7 @@ class playGame extends Phaser.Scene {
     this.accumMS = 0;
     this.hzMS = (1 / 60) * 1000;
     this.afk = false;
-    this.level = level || 0;
+    this.level = 50 || 0;
     this.gameOver = false;
     this.score = 0;
     this.lives = 5;
@@ -59,13 +78,13 @@ class playGame extends Phaser.Scene {
       {
         smallTargets: 30,
         bigTargets: 0,
-        minDelay: 500,
-        maxDelay: 1000,
-        duration: 1500,
+        minDelay: FASTEST_ENEMY_MIN,
+        maxDelay: FASTEST_ENEMY_MAX,
+        duration: FASTEST_ENEMY_SPEED,
       },
     ];
     this.enemies = {};
-    this.remainingTargets = this.levels[this.level].smallTargets + this.levels[this.level].bigTargets;
+    // this.remainingTargets = this.levels[this.level].smallTargets + this.levels[this.level].bigTargets;
     this.hitList = [];
     this.meleeContactList = [];
   }
@@ -176,6 +195,10 @@ class playGame extends Phaser.Scene {
       'wake',
       function () {
         if (this.gameOver) {
+          if (this.level < this.levels.length - 1) {
+            this.level += 1;
+            this.remainingTargets = this.levels[this.level].smallTargets + this.levels[this.level].bigTargets;
+          }
           this.initEnemies();
           this.gameOver = false;
         }
@@ -316,19 +339,12 @@ class playGame extends Phaser.Scene {
     this.healthBar.restore();
     this.energyBar.restore();
     this.sound.stopByKey('disturbing_piano_string');
-    this.time.addEvent({ delay: 2000, callback: this.chooseNextLevel, callbackScope: this, repeat: 0 });
+    this.time.addEvent({ delay: 2000, callback: this.showScoreboard, callbackScope: this, repeat: 0 });
   }
 
-  chooseNextLevel() {
-    if (this.level < this.levels.length - 1) {
-      this.scene.sleep('playGame');
-      this.level += 1;
-      this.remainingTargets = this.levels[this.level].smallTargets + this.levels[this.level].bigTargets;
-      this.scene.launch('scoreScene');
-    } else {
-      this.scene.stop('playGame');
-      this.scene.start('gameOverScene', { score: this.score, best: this.best });
-    }
+  showScoreboard() {
+    this.scene.sleep('playGame');
+    this.scene.launch('scoreScene');
   }
 
   onPlayerHit(bigEye) {
@@ -396,52 +412,132 @@ class playGame extends Phaser.Scene {
   }
 
   initEnemies() {
-    var delay = 0;
-    // Destructure Level props
-    const { minDelay, maxDelay, duration, smallTargets, bigTargets } = this.levels[this.level];
-    let position = Between(1, 4);
-    let prevPosition = null;
-
-    // Setup all the enemies for this level
-    if (smallTargets === 0) {
-      for (let i = 0; i < bigTargets; i++) {
-        while (position === prevPosition) {
-          position = Between(1, 4);
-        }
-        delay = this.createEnemy(delay, minDelay, maxDelay, duration, true, position);
-        prevPosition = position;
-      }
+    if (!this.levels[this.level]) {
+      const { enemies, nEnemies } = this.generateMixedEnemies();
+      this.remainingTargets = nEnemies;
+      this.initLvlMixedEnemies(enemies);
+    }
+    //* In-built levels 1 - 4
+    else if (this.levels[this.level].smallTargets === 0) {
+      this.initLvlBigTargetsOnly(this.levels[this.level]);
     } else {
-      const bigEyeTime = [];
-      for (let i = 0; i < bigTargets; i++) {
-        bigEyeTime.push(Between(0, smallTargets - 1));
-      }
-      bigEyeTime.sort(function (a, b) {
-        return a - b;
-      });
+      this.initLvlSmallAndBigTargets(this.levels[this.level]);
+    }
+  }
 
-      for (let i = 0; i < smallTargets; ) {
-        if (bigEyeTime.length > 0 && bigEyeTime[0] === i) {
-          bigEyeTime.splice(0, 1);
-          while (position === prevPosition) {
-            position = Between(1, 4);
+  generateMixedEnemies() {
+    const smallTargets = new Array(0).fill('small');
+    const bigTargets = new Array(0).fill('big');
+    const swarms = new Array(0).fill('swarm');
+    const smallSwarms = new Array(0).fill('small_swarm');
+    const superSonicTargets = new Array(5).fill('sonic');
+
+    let enemies = shuffle(smallTargets.concat(bigTargets).concat(swarms).concat(smallSwarms).concat(superSonicTargets));
+    const nEnemies =
+      smallTargets.length + bigTargets.length + superSonicTargets.length * N_SUPER_SONIC + swarms.length * N_ENEMIES_SWARM + smallSwarms * N_ENEMIES_IN_ONE_LOCATION;
+
+    return { nEnemies, enemies };
+  }
+
+  initLvlMixedEnemies(enemies) {
+    var delay = 0;
+    let currLocation = Between(1, 4);
+    let prevLocation = null;
+
+    const W = this.cameras.main.width;
+    const H = this.cameras.main.height;
+
+    for (let i = 0; i < enemies.length; i++) {
+      if (enemies[i] === 'small' || enemies[i] === 'big' || enemies[i] === 'sonic') {
+        const isBigEye = enemies[i] === 'big';
+        const isSuperFast = enemies[i] === 'sonic';
+        //* Change location if same spot as prev
+        while (currLocation === prevLocation) {
+          currLocation = Between(1, 4);
+        }
+        delay += Between(isSuperFast ? SUPER_SONIC_MIN : FASTEST_ENEMY_MIN, isSuperFast ? SUPER_SONIC_MAX : FASTEST_ENEMY_MAX);
+        const speed = isSuperFast ? SUPER_SONIC_SPEED : FASTEST_ENEMY_SPEED;
+        let { x, y } = this.generateRandomEnemyCoordinates(currLocation);
+        
+        const nTargets = isSuperFast ? N_SUPER_SONIC : 1;
+        for (let i = 0; i < nTargets; i++) {
+          this.createEnemy(delay + 100 * i, speed, isBigEye, x, y);
+        }
+        prevLocation = currLocation;
+      }
+      else if (enemies[i] === 'swarm' || enemies[i] === 'small_swarm') {
+        const isBigEye = false;
+        const isSmallSwarm = enemies[i] === 'small_swarm';
+        const space = W / N_ENEMIES_IN_ONE_LOCATION;
+        delay += Between(SWARM_DELAY_MIN, SWARM_DELAY_MAX) + SWARM_SPEED;
+
+        if (isSmallSwarm) {
+          for (let i = 0; i < N_ENEMIES_IN_ONE_LOCATION; i++) {
+            let y = i * space;
+            this.createEnemy(delay, SWARM_SPEED, isBigEye, 0, y);
           }
-          delay = this.createEnemy(delay, minDelay, maxDelay, duration, true, position);
-          prevPosition = position;
         } else {
-          while (position === prevPosition) {
-            position = Between(1, 4);
+          for (let i = 0; i < N_ENEMIES_IN_ONE_LOCATION; i++) {
+            let x = i * space;
+            let y = i * space;
+            this.createEnemy(delay, SWARM_SPEED, isBigEye, x, 0);
+            this.createEnemy(delay, SWARM_SPEED, isBigEye, x, H);
+            this.createEnemy(delay, SWARM_SPEED, isBigEye, 0, y);
+            this.createEnemy(delay, SWARM_SPEED, isBigEye, W, y);
           }
-          delay = this.createEnemy(delay, minDelay, maxDelay, duration, false, position);
-          prevPosition = position;
-          i++;
         }
       }
     }
   }
 
-  createEnemy(delay, min, max, duration, bigEye, position) {
-    const { x, y } = this.getEnemyPosition(position);
+  initLvlBigTargetsOnly({ bigTargets, minDelay, maxDelay, duration }) {
+    var delay = 0;
+    let currLocation = Between(1, 4);
+    let prevLocation = null;
+
+    for (let i = 0; i < bigTargets; i++) {
+      while (currLocation === prevLocation) {
+        currLocation = Between(1, 4);
+      }
+      delay += Between(minDelay, maxDelay);
+      const { x, y } = this.generateRandomEnemyCoordinates(currLocation);
+      this.createEnemy(delay, duration, true, x, y);
+      prevLocation = currLocation;
+    }
+  }
+
+  initLvlSmallAndBigTargets({ smallTargets, bigTargets, minDelay, maxDelay, duration }) {
+    var delay = 0;
+    let currLocation = Between(1, 4);
+    let prevLocation = null;
+    const bigEnemySpawnOrder = [];
+
+    for (let i = 0; i < bigTargets; i++) {
+      bigEnemySpawnOrder.push(Between(0, smallTargets - 1));
+    }
+    bigEnemySpawnOrder.sort(function (a, b) {
+      return a - b;
+    });
+
+    for (let i = 0; i < smallTargets; ) {
+      let isBigEye = bigEnemySpawnOrder.length > 0 && bigEnemySpawnOrder[0] === i;
+
+      while (currLocation === prevLocation) {
+        currLocation = Between(1, 4);
+      }
+      delay += Between(minDelay, maxDelay);
+      const { x, y } = this.generateRandomEnemyCoordinates(currLocation);
+      this.createEnemy(delay, duration, isBigEye, x, y);
+      prevLocation = currLocation;
+
+      if (isBigEye) bigEnemySpawnOrder.shift();
+      else i++;
+    }
+  }
+
+  initEnemySwarm() {}
+
+  createEnemy(delay, duration, bigEye, x, y) {
     const key = uuidv4();
     const colour = colours[Math.floor(Math.random() * 6 - 0)]; // random colour
     this.enemies[key] = new FlyingMonster({
@@ -455,7 +551,6 @@ class playGame extends Phaser.Scene {
       flip: x < this.portal.x,
     });
     this.enemies[key].body.setAngle(Math.atan2(y - this.portal.y, x - this.portal.x));
-    delay += Between(min, max);
 
     this.enemies[key].tween = this.tweens.add({
       targets: this.enemies[key],
@@ -492,24 +587,35 @@ class playGame extends Phaser.Scene {
         this.scene.start('gameOverScene', { score: this.score, best: this.best });
       }.bind(this),
     });
-    return delay;
   }
 
-  getEnemyPosition(position) {
+  generateRandomEnemyCoordinates(position) {
     const W = this.cameras.main.width;
     const H = this.cameras.main.height;
     if (position === 1) {
       //* Top left
-      return { x: Between(0, W / 2 - 75 * assetsDPR * 2), y: 0 };
+      return {
+        x: Between(0, W / 2 - 75 * assetsDPR * 2),
+        y: 0,
+      };
     } else if (position === 2) {
       //* Top right
-      return { x: Between(W / 2 + 75 * assetsDPR * 2, W), y: 0 };
+      return {
+        x: Between(W / 2 + 75 * assetsDPR * 2, W),
+        y: 0,
+      };
     } else if (position === 3) {
       //* Left
-      return { x: 0, y: Between(0, H) };
+      return {
+        x: 0,
+        y: Between(0, H),
+      };
     } else if (position === 4) {
       // Right
-      return { x: W, y: Between(0, H) };
+      return {
+        x: W,
+        y: Between(0, H),
+      };
     }
     return { x: Between(0, W / 2 - 75 * assetsDPR * 2), y: 0 };
   }
