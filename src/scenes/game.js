@@ -26,8 +26,11 @@ import {
   SWARM_DELAY_MAX,
   SWARM_SPEED,
   N_SUPER_SONIC,
-  N_ENEMIES_IN_ONE_LOCATION,
   N_ENEMIES_SWARM,
+  N_SMALL_TARGETS,
+  BIG_TARGETS,
+  SONIC_TARGETS,
+  N_SWARMS,
 } from '../constants';
 
 import { gameState } from '../state/gameState';
@@ -424,17 +427,14 @@ class playGame extends Phaser.Scene {
       this.initLvlSmallAndBigTargets(this.levels[this.level]);
     }
   }
-
   generateMixedEnemies() {
-    const smallTargets = new Array(0).fill('small');
-    const bigTargets = new Array(0).fill('big');
-    const swarms = new Array(0).fill('swarm');
-    const smallSwarms = new Array(0).fill('small_swarm');
-    const superSonicTargets = new Array(5).fill('sonic');
+    const smallTargets = new Array(N_SMALL_TARGETS).fill('small');
+    const bigTargets = new Array(BIG_TARGETS).fill('big');
+    const swarms = new Array(N_SWARMS).fill('swarm');
+    const superSonicTargets = new Array(SONIC_TARGETS).fill('sonic');
 
-    let enemies = shuffle(smallTargets.concat(bigTargets).concat(swarms).concat(smallSwarms).concat(superSonicTargets));
-    const nEnemies =
-      smallTargets.length + bigTargets.length + superSonicTargets.length * N_SUPER_SONIC + swarms.length * N_ENEMIES_SWARM + smallSwarms * N_ENEMIES_IN_ONE_LOCATION;
+    let enemies = shuffle(smallTargets.concat(bigTargets).concat(swarms).concat(superSonicTargets));
+    const nEnemies = smallTargets.length + bigTargets.length + superSonicTargets.length * N_SUPER_SONIC + swarms.length * N_ENEMIES_SWARM;
 
     return { nEnemies, enemies };
   }
@@ -445,7 +445,6 @@ class playGame extends Phaser.Scene {
     let prevLocation = null;
 
     const W = this.cameras.main.width;
-    const H = this.cameras.main.height;
 
     for (let i = 0; i < enemies.length; i++) {
       if (enemies[i] === 'small' || enemies[i] === 'big' || enemies[i] === 'sonic') {
@@ -458,32 +457,25 @@ class playGame extends Phaser.Scene {
         delay += Between(isSuperFast ? SUPER_SONIC_MIN : FASTEST_ENEMY_MIN, isSuperFast ? SUPER_SONIC_MAX : FASTEST_ENEMY_MAX);
         const speed = isSuperFast ? SUPER_SONIC_SPEED : FASTEST_ENEMY_SPEED;
         let { x, y } = this.generateRandomEnemyCoordinates(currLocation);
-        
+
         const nTargets = isSuperFast ? N_SUPER_SONIC : 1;
         for (let i = 0; i < nTargets; i++) {
           this.createEnemy(delay + 100 * i, speed, isBigEye, x, y);
         }
         prevLocation = currLocation;
-      }
-      else if (enemies[i] === 'swarm' || enemies[i] === 'small_swarm') {
+      } else if (enemies[i] === 'swarm') {
         const isBigEye = false;
-        const isSmallSwarm = enemies[i] === 'small_swarm';
-        const space = W / N_ENEMIES_IN_ONE_LOCATION;
+        const space = W / N_ENEMIES_SWARM;
         delay += Between(SWARM_DELAY_MIN, SWARM_DELAY_MAX) + SWARM_SPEED;
+        const location = Between(1, 2);
 
-        if (isSmallSwarm) {
-          for (let i = 0; i < N_ENEMIES_IN_ONE_LOCATION; i++) {
-            let y = i * space;
-            this.createEnemy(delay, SWARM_SPEED, isBigEye, 0, y);
-          }
-        } else {
-          for (let i = 0; i < N_ENEMIES_IN_ONE_LOCATION; i++) {
-            let x = i * space;
-            let y = i * space;
-            this.createEnemy(delay, SWARM_SPEED, isBigEye, x, 0);
-            this.createEnemy(delay, SWARM_SPEED, isBigEye, x, H);
-            this.createEnemy(delay, SWARM_SPEED, isBigEye, 0, y);
-            this.createEnemy(delay, SWARM_SPEED, isBigEye, W, y);
+        for (let i = 0; i < N_ENEMIES_SWARM; i++) {
+          let x = i * space;
+          let y = i * space;
+          if (location === 1) {
+            this.createEnemy(delay + i * 40, SWARM_SPEED, isBigEye, 0, y);
+          } else {
+            this.createEnemy(delay + i * 40, SWARM_SPEED, isBigEye, W, y);
           }
         }
       }
