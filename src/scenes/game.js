@@ -16,6 +16,9 @@ import { shuffle } from '../utils/math';
 
 //* Constants
 import {
+  WORLD_SCALE_FACTOR,
+  BLOOD_SPLATTER_DELAY,
+  ROUND_END_HANG_TIME,
   FASTEST_ENEMY_MIN,
   FASTEST_ENEMY_MAX,
   FASTEST_ENEMY_SPEED,
@@ -31,6 +34,9 @@ import {
   BIG_TARGETS,
   SONIC_TARGETS,
   N_SWARMS,
+  N_LOCATIONS,
+  ENEMY_DAMAGE,
+  BIG_ENEMY_DAMAGE,
 } from '../constants';
 
 import { gameState } from '../state/gameState';
@@ -54,7 +60,6 @@ class playGame extends Phaser.Scene {
     this.level = 50 || 0;
     this.gameOver = false;
     this.score = 0;
-    this.lives = 5;
     this.best = localStorage.getItem('best_score') ? parseInt(localStorage.getItem('best_score'), 10) : 0;
     this.levels = [
       {
@@ -98,7 +103,7 @@ class playGame extends Phaser.Scene {
     // alignGrid.showNumbers();
 
     this.world = new Planck.World(Planck.Vec2(this.gravity.x, this.gravity.y));
-    this.scaleFactor = 30;
+    this.scaleFactor = WORLD_SCALE_FACTOR;
 
     // Planck event bindings
     this.world.on('pre-solve', (contact, oldManifold) => {});
@@ -342,7 +347,7 @@ class playGame extends Phaser.Scene {
     this.healthBar.restore();
     this.energyBar.restore();
     this.sound.stopByKey('disturbing_piano_string');
-    this.time.addEvent({ delay: 2000, callback: this.showScoreboard, callbackScope: this, repeat: 0 });
+    this.time.addEvent({ delay: ROUND_END_HANG_TIME, callback: this.showScoreboard, callbackScope: this, repeat: 0 });
   }
 
   showScoreboard() {
@@ -351,7 +356,7 @@ class playGame extends Phaser.Scene {
   }
 
   onPlayerHit(bigEye) {
-    let damageDealt = bigEye ? 90 : 35;
+    let damageDealt = bigEye ? BIG_ENEMY_DAMAGE : ENEMY_DAMAGE;
     this.healthBar.damage(damageDealt);
     this.player.hit();
     this.checkGameOver();
@@ -379,7 +384,7 @@ class playGame extends Phaser.Scene {
           this.enemies[key].play('blood_splatter');
         } else {
           this.time.addEvent({
-            delay: 500,
+            delay: BLOOD_SPLATTER_DELAY,
             callback: function () {
               if (this.enemies[key]) {
                 this.enemies[key].play('blood_splatter');
@@ -441,7 +446,7 @@ class playGame extends Phaser.Scene {
 
   initLvlMixedEnemies(enemies) {
     var delay = 0;
-    let currLocation = Between(1, 4);
+    let currLocation = Between(1, N_LOCATIONS);
     let prevLocation = null;
 
     const W = this.cameras.main.width;
@@ -452,7 +457,7 @@ class playGame extends Phaser.Scene {
         const isSuperFast = enemies[i] === 'sonic';
         //* Change location if same spot as prev
         while (currLocation === prevLocation) {
-          currLocation = Between(1, 4);
+          currLocation = Between(1, N_LOCATIONS);
         }
         delay += Between(isSuperFast ? SUPER_SONIC_MIN : FASTEST_ENEMY_MIN, isSuperFast ? SUPER_SONIC_MAX : FASTEST_ENEMY_MAX);
         const speed = isSuperFast ? SUPER_SONIC_SPEED : FASTEST_ENEMY_SPEED;
@@ -484,12 +489,12 @@ class playGame extends Phaser.Scene {
 
   initLvlBigTargetsOnly({ bigTargets, minDelay, maxDelay, duration }) {
     var delay = 0;
-    let currLocation = Between(1, 4);
+    let currLocation = Between(1, N_LOCATIONS);
     let prevLocation = null;
 
     for (let i = 0; i < bigTargets; i++) {
       while (currLocation === prevLocation) {
-        currLocation = Between(1, 4);
+        currLocation = Between(1, N_LOCATIONS);
       }
       delay += Between(minDelay, maxDelay);
       const { x, y } = this.generateRandomEnemyCoordinates(currLocation);
@@ -500,7 +505,7 @@ class playGame extends Phaser.Scene {
 
   initLvlSmallAndBigTargets({ smallTargets, bigTargets, minDelay, maxDelay, duration }) {
     var delay = 0;
-    let currLocation = Between(1, 4);
+    let currLocation = Between(1, N_LOCATIONS);
     let prevLocation = null;
     const bigEnemySpawnOrder = [];
 
@@ -515,7 +520,7 @@ class playGame extends Phaser.Scene {
       let isBigEye = bigEnemySpawnOrder.length > 0 && bigEnemySpawnOrder[0] === i;
 
       while (currLocation === prevLocation) {
-        currLocation = Between(1, 4);
+        currLocation = Between(1, N_LOCATIONS);
       }
       delay += Between(minDelay, maxDelay);
       const { x, y } = this.generateRandomEnemyCoordinates(currLocation);
@@ -574,7 +579,6 @@ class playGame extends Phaser.Scene {
           isPlayerHit: false,
           meleeKill: false,
         });
-        this.lives -= 1;
         this.sound.play('portal_damaged');
         this.scene.start('gameOverScene', { score: this.score, best: this.best });
       }.bind(this),
