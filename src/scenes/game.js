@@ -308,7 +308,7 @@ class playGame extends Phaser.Scene {
       this.gameOver = true;
       this.endLevel();
     }
-    
+
     else if (this.remainingTargets <= 0 && this.roundTargets.length > 0) {
       this.initGeneratedEnemies();
     }
@@ -399,7 +399,6 @@ class playGame extends Phaser.Scene {
         this.removeEnemy(key);
       }
       this.remainingTargets -= 1;
-      console.log(this.remainingTargets);
     }
   }
 
@@ -448,7 +447,7 @@ class playGame extends Phaser.Scene {
     const swarms = new Array(N_SWARMS).fill('swarm');
     const superSonicTargets = new Array(SONIC_TARGETS).fill('sonic');
 
-    let enemies = shuffle(smallTargets.concat(bigTargets).concat(swarms).concat(superSonicTargets));
+    let enemies = shuffle(smallTargets.concat(bigTargets).concat(swarms).concat(superSonicTargets).concat(swarms));
 
     return enemies;
   }
@@ -459,62 +458,43 @@ class playGame extends Phaser.Scene {
     let i = 0;
 
     while (this.roundTargets.length > 0 && i < 10) {
-      console.log(`i: ${i}`);
       const enemy = this.roundTargets.shift();
 
-      let currLocation = Between(1, N_LOCATIONS);
+      if (this.roundTargets[0] === 'swarm') {
+        this.roundTargets.shift();
+        const isBigEye = false;
+        const space = width / N_ENEMIES_SWARM;
+        delay += Between(SWARM_DELAY_MIN, SWARM_DELAY_MAX);
+        const location = Between(1, 2);
 
-      const isBigEye = enemy === 'big';
-      const isSuperFast = enemy === 'sonic';
-      const nTargets = isSuperFast ? N_SUPER_SONIC : 1;
-      delay += Between(isSuperFast ? SUPER_SONIC_MIN : FASTEST_ENEMY_MIN, isSuperFast ? SUPER_SONIC_MAX : FASTEST_ENEMY_MAX);
-      const speed = isSuperFast ? SUPER_SONIC_SPEED : FASTEST_ENEMY_SPEED;
-      let { x, y } = this.generateRandomEnemyCoordinates(currLocation);
-
-      for (let i = 0; i < nTargets; i++) {
-        this.createEnemy(delay + 100 * i, speed, isBigEye, x, y);
+        for (let i = 0; i < N_ENEMIES_SWARM; i++) {
+          let y = i * space;
+          if (location === 1) {
+            this.createEnemy(delay + i * 100, SWARM_SPEED, isBigEye, 0, y);
+          } else {
+            this.createEnemy(delay + i * 100, SWARM_SPEED, isBigEye, width, y);
+          }
+        }
+        this.remainingTargets += N_ENEMIES_SWARM;
+        i += 10;
       }
-      this.remainingTargets += nTargets;
-      i++;
+      else {
+        let currLocation = Between(1, N_LOCATIONS);
+
+        const isBigEye = enemy === 'big';
+        const isSuperFast = enemy === 'sonic';
+        const nTargets = isSuperFast ? N_SUPER_SONIC : 1;
+        delay += Between(isSuperFast ? SUPER_SONIC_MIN : FASTEST_ENEMY_MIN, isSuperFast ? SUPER_SONIC_MAX : FASTEST_ENEMY_MAX);
+        const speed = isSuperFast ? SUPER_SONIC_SPEED : FASTEST_ENEMY_SPEED;
+        let { x, y } = this.generateRandomEnemyCoordinates(currLocation);
+
+        for (let i = 0; i < nTargets; i++) {
+          this.createEnemy(delay + 100 * i, speed, isBigEye, x, y);
+        }
+        this.remainingTargets += nTargets;
+        i++;
+      }
     }
-
-    // if (this.roundTargets.length > 0) {
-    //   if (this.roundTargets[0] === 'swarm') {
-    //     this.roundTargets.shift();
-    //     const isBigEye = false;
-    //     const space = width / N_ENEMIES_SWARM;
-    //     delay += Between(SWARM_DELAY_MIN, SWARM_DELAY_MAX);
-    //     const location = Between(1, 2);
-
-    //     for (let i = 0; i < N_ENEMIES_SWARM; i++) {
-    //       let y = i * space;
-    //       if (location === 1) {
-    //         this.createEnemy(delay + i * 40, SWARM_SPEED, isBigEye, 0, y);
-    //       } else {
-    //         this.createEnemy(delay + i * 40, SWARM_SPEED, isBigEye, width, y);
-    //       }
-    //     }
-    //     this.remainingTargets += N_ENEMIES_SWARM;
-    //   } else {
-    //     while (this.roundTargets.length > 0 && this.roundTargets[0] === 'small' || this.roundTargets[0] === 'big') {
-    //       const enemy = this.roundTargets.shift();
-
-    //       if (enemy === 'small' || enemy === 'big' || enemy === 'sonic') {
-    //         const isBigEye = enemy === 'big';
-    //         const isSuperFast = enemy === 'sonic';
-    //         const nTargets = isSuperFast ? N_SUPER_SONIC : 1;
-    //         this.remainingTargets += nTargets;
-    //         delay += Between(isSuperFast ? SUPER_SONIC_MIN : FASTEST_ENEMY_MIN, isSuperFast ? SUPER_SONIC_MAX : FASTEST_ENEMY_MAX);
-    //         const speed = isSuperFast ? SUPER_SONIC_SPEED : FASTEST_ENEMY_SPEED;
-    //         let { x, y } = this.generateRandomEnemyCoordinates(currLocation);
-
-    //         for (let i = 0; i < nTargets; i++) {
-    //           this.createEnemy(delay + 100 * i, speed, isBigEye, x, y);
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
   }
 
   initLvlBigTargetsOnly({ bigTargets, minDelay, maxDelay, duration }) {

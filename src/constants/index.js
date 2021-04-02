@@ -13,7 +13,7 @@ export const SWARM_SPEED = 3000;
 
 //* Number of enemies
 export const N_LOCATIONS = 4; // top, right, bottom, left
-export const N_ENEMIES_SWARM = 10;
+export const N_ENEMIES_SWARM = 7;
 export const N_SUPER_SONIC = 6;
 
 export const N_SMALL_TARGETS = 40;
