@@ -656,6 +656,12 @@ class playGame extends Phaser.Scene {
     if (this.healthBar.health <= 0) {
       this.healthBar.restore();
       this.updateKillCounter();
+
+      if (this.score > this.best) {
+        localStorage.setItem('best_score', this.score);
+        this.best = this.score;
+      }
+
       return this.scene.start('gameOverScene', { score: this.score, best: this.best });
     }
   }
