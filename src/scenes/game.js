@@ -421,7 +421,7 @@ class playGame extends Phaser.Scene {
   }
 
   setupLevel() {
-    if (this.level < this.levels.length - 1) {
+    if (this.level < this.levels.length) {
       this.remainingTargets = this.levels[this.level].smallTargets + this.levels[this.level].bigTargets;
       this.initLvlEnemies();
       this.level += 1;
