@@ -57,7 +57,7 @@ class playGame extends Phaser.Scene {
     this.accumMS = 0;
     this.hzMS = (1 / 60) * 1000;
     this.afk = false;
-    this.level = 50 || 0;
+    this.level = level || 0;
     this.gameOver = false;
     this.score = 0;
     this.best = localStorage.getItem('best_score') ? parseInt(localStorage.getItem('best_score'), 10) : 0;
