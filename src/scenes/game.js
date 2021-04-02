@@ -92,7 +92,8 @@ class playGame extends Phaser.Scene {
       },
     ];
     this.enemies = {};
-    // this.remainingTargets = this.levels[this.level].smallTargets + this.levels[this.level].bigTargets;
+    this.roundTargets = [];
+    this.remainingTargets = this.levels[this.level] ? this.levels[this.level].smallTargets + this.levels[this.level].bigTargets : 0;
     this.hitList = [];
     this.meleeContactList = [];
   }
@@ -106,8 +107,8 @@ class playGame extends Phaser.Scene {
     this.scaleFactor = WORLD_SCALE_FACTOR;
 
     // Planck event bindings
-    this.world.on('pre-solve', (contact, oldManifold) => {});
-    this.world.on('post-solve', (contact, oldManifold) => {});
+    this.world.on('pre-solve', (contact, oldManifold) => { });
+    this.world.on('post-solve', (contact, oldManifold) => { });
 
     this.world.on('begin-contact', (contact, oldManifold) => {
       const a = contact.getFixtureA().getUserData();
@@ -162,7 +163,7 @@ class playGame extends Phaser.Scene {
         }
       }
     });
-    this.world.on('end-contact', (contact, oldManifold) => {});
+    this.world.on('end-contact', (contact, oldManifold) => { });
 
     //* Ghost Warrior animations
     this.createAnimation('fly', 'ghost_warrior', 'fly', 1, 5, '.png', true, -1, 10, 0);
@@ -203,11 +204,7 @@ class playGame extends Phaser.Scene {
       'wake',
       function () {
         if (this.gameOver) {
-          if (this.level < this.levels.length - 1) {
-            this.level += 1;
-            this.remainingTargets = this.levels[this.level].smallTargets + this.levels[this.level].bigTargets;
-          }
-          this.initEnemies();
+          this.setupLevel();
           this.gameOver = false;
         }
       },
@@ -303,13 +300,17 @@ class playGame extends Phaser.Scene {
 
     this.cameras.main.fadeIn(500);
 
-    this.initEnemies();
+    this.setupLevel();
   }
 
   update(time, delta) {
-    if (this.remainingTargets <= 0 && !this.gameOver) {
+    if (this.remainingTargets <= 0 && this.roundTargets.length <= 0 && !this.gameOver) {
       this.gameOver = true;
       this.endLevel();
+    }
+    
+    else if (this.remainingTargets <= 0 && this.roundTargets.length > 0) {
+      this.initGeneratedEnemies();
     }
 
     if (!this.gameOver) {
@@ -398,6 +399,7 @@ class playGame extends Phaser.Scene {
         this.removeEnemy(key);
       }
       this.remainingTargets -= 1;
+      console.log(this.remainingTargets);
     }
   }
 
@@ -419,19 +421,27 @@ class playGame extends Phaser.Scene {
     }
   }
 
-  initEnemies() {
-    if (!this.levels[this.level]) {
-      const { enemies, nEnemies } = this.generateMixedEnemies();
-      this.remainingTargets = nEnemies;
-      this.initLvlMixedEnemies(enemies);
+  setupLevel() {
+    if (this.level < this.levels.length - 1) {
+      this.level += 1;
+      this.remainingTargets = this.levels[this.level].smallTargets + this.levels[this.level].bigTargets;
+      this.initLvlEnemies();
+    } else {
+      let enemies = this.generateMixedEnemies();
+      this.roundTargets = enemies;
+      this.initGeneratedEnemies();
     }
+  }
+
+  initLvlEnemies() {
     //* In-built levels 1 - 4
-    else if (this.levels[this.level].smallTargets === 0) {
+    if (this.levels[this.level].smallTargets === 0) {
       this.initLvlBigTargetsOnly(this.levels[this.level]);
     } else {
       this.initLvlSmallAndBigTargets(this.levels[this.level]);
     }
   }
+
   generateMixedEnemies() {
     const smallTargets = new Array(N_SMALL_TARGETS).fill('small');
     const bigTargets = new Array(BIG_TARGETS).fill('big');
@@ -439,52 +449,72 @@ class playGame extends Phaser.Scene {
     const superSonicTargets = new Array(SONIC_TARGETS).fill('sonic');
 
     let enemies = shuffle(smallTargets.concat(bigTargets).concat(swarms).concat(superSonicTargets));
-    const nEnemies = smallTargets.length + bigTargets.length + superSonicTargets.length * N_SUPER_SONIC + swarms.length * N_ENEMIES_SWARM;
 
-    return { nEnemies, enemies };
+    return enemies;
   }
 
-  initLvlMixedEnemies(enemies) {
+  initGeneratedEnemies() {
     var delay = 0;
-    let currLocation = Between(1, N_LOCATIONS);
-    let prevLocation = null;
+    const { width } = this.cameras.main;
+    let i = 0;
 
-    const W = this.cameras.main.width;
+    while (this.roundTargets.length > 0 && i < 10) {
+      console.log(`i: ${i}`);
+      const enemy = this.roundTargets.shift();
 
-    for (let i = 0; i < enemies.length; i++) {
-      if (enemies[i] === 'small' || enemies[i] === 'big' || enemies[i] === 'sonic') {
-        const isBigEye = enemies[i] === 'big';
-        const isSuperFast = enemies[i] === 'sonic';
-        //* Change location if same spot as prev
-        while (currLocation === prevLocation) {
-          currLocation = Between(1, N_LOCATIONS);
-        }
-        delay += Between(isSuperFast ? SUPER_SONIC_MIN : FASTEST_ENEMY_MIN, isSuperFast ? SUPER_SONIC_MAX : FASTEST_ENEMY_MAX);
-        const speed = isSuperFast ? SUPER_SONIC_SPEED : FASTEST_ENEMY_SPEED;
-        let { x, y } = this.generateRandomEnemyCoordinates(currLocation);
+      let currLocation = Between(1, N_LOCATIONS);
 
-        const nTargets = isSuperFast ? N_SUPER_SONIC : 1;
-        for (let i = 0; i < nTargets; i++) {
-          this.createEnemy(delay + 100 * i, speed, isBigEye, x, y);
-        }
-        prevLocation = currLocation;
-      } else if (enemies[i] === 'swarm') {
-        const isBigEye = false;
-        const space = W / N_ENEMIES_SWARM;
-        delay += Between(SWARM_DELAY_MIN, SWARM_DELAY_MAX) + SWARM_SPEED;
-        const location = Between(1, 2);
+      const isBigEye = enemy === 'big';
+      const isSuperFast = enemy === 'sonic';
+      const nTargets = isSuperFast ? N_SUPER_SONIC : 1;
+      delay += Between(isSuperFast ? SUPER_SONIC_MIN : FASTEST_ENEMY_MIN, isSuperFast ? SUPER_SONIC_MAX : FASTEST_ENEMY_MAX);
+      const speed = isSuperFast ? SUPER_SONIC_SPEED : FASTEST_ENEMY_SPEED;
+      let { x, y } = this.generateRandomEnemyCoordinates(currLocation);
 
-        for (let i = 0; i < N_ENEMIES_SWARM; i++) {
-          let x = i * space;
-          let y = i * space;
-          if (location === 1) {
-            this.createEnemy(delay + i * 40, SWARM_SPEED, isBigEye, 0, y);
-          } else {
-            this.createEnemy(delay + i * 40, SWARM_SPEED, isBigEye, W, y);
-          }
-        }
+      for (let i = 0; i < nTargets; i++) {
+        this.createEnemy(delay + 100 * i, speed, isBigEye, x, y);
       }
+      this.remainingTargets += nTargets;
+      i++;
     }
+
+    // if (this.roundTargets.length > 0) {
+    //   if (this.roundTargets[0] === 'swarm') {
+    //     this.roundTargets.shift();
+    //     const isBigEye = false;
+    //     const space = width / N_ENEMIES_SWARM;
+    //     delay += Between(SWARM_DELAY_MIN, SWARM_DELAY_MAX);
+    //     const location = Between(1, 2);
+
+    //     for (let i = 0; i < N_ENEMIES_SWARM; i++) {
+    //       let y = i * space;
+    //       if (location === 1) {
+    //         this.createEnemy(delay + i * 40, SWARM_SPEED, isBigEye, 0, y);
+    //       } else {
+    //         this.createEnemy(delay + i * 40, SWARM_SPEED, isBigEye, width, y);
+    //       }
+    //     }
+    //     this.remainingTargets += N_ENEMIES_SWARM;
+    //   } else {
+    //     while (this.roundTargets.length > 0 && this.roundTargets[0] === 'small' || this.roundTargets[0] === 'big') {
+    //       const enemy = this.roundTargets.shift();
+
+    //       if (enemy === 'small' || enemy === 'big' || enemy === 'sonic') {
+    //         const isBigEye = enemy === 'big';
+    //         const isSuperFast = enemy === 'sonic';
+    //         const nTargets = isSuperFast ? N_SUPER_SONIC : 1;
+    //         this.remainingTargets += nTargets;
+    //         delay += Between(isSuperFast ? SUPER_SONIC_MIN : FASTEST_ENEMY_MIN, isSuperFast ? SUPER_SONIC_MAX : FASTEST_ENEMY_MAX);
+    //         const speed = isSuperFast ? SUPER_SONIC_SPEED : FASTEST_ENEMY_SPEED;
+    //         let { x, y } = this.generateRandomEnemyCoordinates(currLocation);
+
+    //         for (let i = 0; i < nTargets; i++) {
+    //           this.createEnemy(delay + 100 * i, speed, isBigEye, x, y);
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
   }
 
   initLvlBigTargetsOnly({ bigTargets, minDelay, maxDelay, duration }) {
@@ -516,7 +546,7 @@ class playGame extends Phaser.Scene {
       return a - b;
     });
 
-    for (let i = 0; i < smallTargets; ) {
+    for (let i = 0; i < smallTargets;) {
       let isBigEye = bigEnemySpawnOrder.length > 0 && bigEnemySpawnOrder[0] === i;
 
       while (currLocation === prevLocation) {
@@ -531,8 +561,6 @@ class playGame extends Phaser.Scene {
       else i++;
     }
   }
-
-  initEnemySwarm() {}
 
   createEnemy(delay, duration, bigEye, x, y) {
     const key = uuidv4();
@@ -552,7 +580,7 @@ class playGame extends Phaser.Scene {
     this.enemies[key].tween = this.tweens.add({
       targets: this.enemies[key],
       visible: {
-        from: true,
+        from: false,
       },
       x: {
         from: x,

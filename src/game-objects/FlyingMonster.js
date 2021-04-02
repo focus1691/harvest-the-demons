@@ -10,6 +10,7 @@ export default class Enemy extends Sprite {
     this.colour = config.colour;
     this.isAlive = true;
     this.bigEye = config.bigEye;
+    this.setAlpha(0);
 
     this.setFlipY(config.flip);
 
