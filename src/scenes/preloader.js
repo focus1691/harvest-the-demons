@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 // Images
-import backgroundImg from '../assets/images/2_game_background.png';
+import backgroundImg from '../assets/images/background.jpg';
 import soundOnImg from '../assets/images/white_soundOn.png';
 import soundOffImg from '../assets/images/white_soundOff.png';
 import portalImg from '../assets/images/__red_hell_portal_horns_lava_000.png';
