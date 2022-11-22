@@ -11,6 +11,10 @@
 - [TexturePacker](https://www.codeandweb.com/texturepacker) - used to create the spritesheets.
 - [PhysicsEditor](https://www.codeandweb.com/physicseditor) - used to create the hitboxes and entity bodies.
 
+## Previews
+![Preview](https://github.com/traderjosh/harvest-the-demons/blob/master/previews/preview1.gif)
+![Preview](https://github.com/traderjosh/harvest-the-demons/blob/master/previews/preview2.gif)
+
 # Phaser 3 Webpack Project Template
 
 A Phaser 3 project template with ES6 support via [Babel 7](https://babeljs.io/) and [Webpack 4](https://webpack.js.org/)
