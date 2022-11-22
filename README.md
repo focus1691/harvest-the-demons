@@ -1,3 +1,16 @@
+# Harvest the Demons
+
+[Play Here](https://traderjosh.itch.io/harvest-the-demons)
+
+## Libraries:
+
+- `planck-js` was used for **Continuous collision detection (CCD)**, a JS wewrite of the Box2D Engine.
+
+## Software
+
+- [TexturePacker](https://www.codeandweb.com/texturepacker) - used to create the spritesheets.
+- [PhysicsEditor](https://www.codeandweb.com/physicseditor) - used to create the hitboxes and entity bodies.
+
 # Phaser 3 Webpack Project Template
 
 A Phaser 3 project template with ES6 support via [Babel 7](https://babeljs.io/) and [Webpack 4](https://webpack.js.org/)
