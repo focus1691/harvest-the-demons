@@ -1,6 +1,6 @@
 # Harvest the Demons
 
-[Play Here](https://traderjosh.itch.io/harvest-the-demons)
+[Play Here](https://focus16.itch.io/harvest-the-demons)
 
 ## Libraries:
 
